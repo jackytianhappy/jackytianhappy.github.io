@@ -247,6 +247,172 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/23/LiveDiaryTwo/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jacky Tian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jakcy’s Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/03/23/LiveDiaryTwo/" itemprop="url">
+                  直播日记-1 直播中常用的协议简介
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-23T14:16:38+08:00">
+                2017-03-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <blockquote>
+<p>本文主要介绍直播中常用的协议,RTMP,HLS,HDL(HTTP—FLV),RTP协议，后续文章会针对RTMP进行详细的介绍。</p>
+</blockquote>
+<h2 id="RTMP"><a href="#RTMP" class="headerlink" title="RTMP"></a>RTMP</h2><p>国外大部分CDN已不支持，多内流行度非常高，主要原因如下：<br>1.开源软件和开源库的支持相对比较完整。服务端有ngix-rtmp插件，开源的librtmp等。<br><br>2.播放端安装率高。只要浏览器支持FlashPlayer，非常简单的就能支持RTMP（关于RTMP的详细介绍 后文会进行详细的解读），RTMP是传输层协议，底层通过TCP实现，使用RTMP协议会根据网络状况带来首开100ms的延迟，<font color="green"><strong>内容延迟大概有2-5秒</strong></font>。<br></p>
+<h2 id="HTTP-FLV"><a href="#HTTP-FLV" class="headerlink" title="HTTP-FLV"></a>HTTP-FLV</h2><p>即通过http进行流媒体的传输。相比如RTMP，HTTP更为简单和广为人知，不必担心被Adobe的专利问题，RTMP为Adobe的专利协议。<font color="green"><strong>内容延迟大概有2-5秒</strong></font>，打开速度更快，http协议本身不存在复杂的状态交互。从延迟角度来讲，HTTP-FLV的延迟要小于RTMP的延迟。</p>
+<h2 id="HLS"><a href="#HLS" class="headerlink" title="HLS"></a>HLS</h2><p>即HTTP Live Streaming，有苹果提出，基于HTTP的路媒体传输协议。HLS有一个显著的有点，<font color="green"><strong>能够通过HTML5直接打开</strong></font>，意味着能够通过微信等社交软件进行分析，对于涉及哦啊类型的app来说是一个刚需要。<br><br><br>基于HLS的直播流URL是一个<font color="green"><strong>m3u8</strong></font>的文件，里面包含了若干个小视频TS(一种视频封装格式)<br></p>
+<p><img src="https://github.com/jackytianhappy/ImgSource/blob/master/m3u8%20ts.jpg?raw=true" alt="Atl text"></p>
+<p>假设列表里面的包含5个TS文件，每个TS文件包含5秒的视频内容，那么整体的延迟就是25秒。当然可以缩短列表的长度和单个TS文件的大小来降低延迟，极致来说可以缩减列表长度为1，1秒内容的m3u8文件，但是极易受网络波动影响造成卡顿。</p>
+<h2 id="RTP"><a href="#RTP" class="headerlink" title="RTP"></a>RTP</h2><p>即Real-Time Transport Protocal，用于针对对媒体数据流的一种<font color="green"><strong>传输层协议</strong></font>。<br><br>实际使用过程中需要<font color="green"><strong>RTCP（rtp control protocal）</strong></font>来配合我使用，可以简单理解为RTCP传输交互控制的信令，RTP传输实际的媒体数据。<br></p>
+<p><font color="green"><strong>RTP在视频监控、视频会议、IP电话上有广泛的应用</strong></font>，因为视频会议、IP电话的一个重要的使用体验：内容实时性强。</p>
+<p>RTP相对于HLS和FLV使用UDP协议来传输数据，而RTMP和HTTP是基于TCP协议传输。<br></p>
+<p><font color="green"><strong>UDP：单个数据报，不用建立连接，简单，不可靠，会丢包，会乱序；<br><br>TCP：流式，需要建立连接，复杂，可靠 ，有序。</strong></font><br><br><br>实时音视频流的场景不需要可靠保障，因此也不需要有重传的机制，实时的看到图像声音，网络抖动时丢了一些内容，画面模糊和花屏，完全不重要。TCP为了重传会造成延迟与不同步，如某一截内容因为重传，导致1秒以后才到，那么整个对话就延迟了1秒，随着网络抖动，延迟还会增加成2秒、3秒，如果客户端播放是不加以处理将严重影响直播的体验。</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><table>
+<thead>
+<tr>
+<th>协议名称</th>
+<th>延迟</th>
+<th>优点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>RTMP</td>
+<td>2-5秒</td>
+<td>成熟框架比较多</td>
+</tr>
+<tr>
+<td>HTTP-FLV</td>
+<td>2-5秒</td>
+<td>打开速度快，通内容延迟，打开速度快于rtmp</td>
+</tr>
+<tr>
+<td>HLS</td>
+<td>5-7秒</td>
+<td>能够直接H5打开，社交直播刚需</td>
+</tr>
+<tr>
+<td>RTP</td>
+<td>1S内的直播延迟</td>
+<td>国内CDN支持厂商较少</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>ps:HLS，优点明显，H5直接打开，缺点内容延迟过高，同时支持HLS的必须是H264+AAC编码。</p>
+</blockquote>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/23/LiveDiaryOne/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -327,8 +493,7 @@
             <blockquote>
 <p>最近公司业务调整，开始捣鼓直播。。。这个系列将会详细记录如何从移动端到服务端构建一套直播方案。本篇将会简单的介绍直播技术方案。</p>
 </blockquote>
-<p>#整体架构</p>
-<ul>
+<h1 id="整体架构"><a href="#整体架构" class="headerlink" title="整体架构"></a>整体架构</h1><ul>
 <li><p>推流端 <br><br>终端：设备，手机，PC，视频录制设备<br><br>终端通过音视频的采集，进行编码封装，通过rtmp协议进行传输到服务端。<br></p>
 <blockquote>
 <p>技术细节：1.码率、帧率根据网速自适应 2.支持不同端不用设备 3.传输高品质画面    </p>
@@ -542,7 +707,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">2</span>
+                <span class="site-state-item-count">3</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
