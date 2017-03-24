@@ -103,7 +103,7 @@ AAC高级音频编码（英语：">
 H.264H.264，又称为MPEG-4第10部分，高级视频编码（英语：MPEG-4 Part 10, Advanced Video Coding，缩写为MPEG-4 AVC）是一种面向块的基于运动补偿的视频编码标准. Form wiki 
 
 AAC高级音频编码（英语：">
-<meta property="og:updated_time" content="2017-03-23T13:39:25.000Z">
+<meta property="og:updated_time" content="2017-03-24T03:13:05.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="直播日记-2 h264+AAC在iOS上的实现-原理篇章">
 <meta name="twitter:description" content="为什么要使用h264+AAC去编码？因为HLS是社交类直播APP的刚需，使用HLS必须通过h264+AAC的编码去实现
@@ -375,6 +375,7 @@ AAC高级音频编码（英语：">
 <blockquote>
 <p>Note：<strong>有损（Lossy ）压缩和无损（Lossy less）压缩</strong>。无损压缩也即压缩前和解压缩后的数据完全一致。多数的无损压缩都采用RLE行程编码算法。有损压缩意味着解压缩后的数据与压缩前的数据不一致。在压缩的过程中要丢失一些人眼和人耳所不敏感的图像或音频信息,而且丢失的信息不可恢复。几乎所有高压缩的算法都采用有损压缩,这样才能达到低数据率的目标。丢失的数据率与压缩比有关,压缩比越小，丢失的数据越多,解压缩后的效果一般越差。此外,某些有损压缩算法采用多次重复压缩的方式,这样还会引起额外的数据丢失。</p>
 </blockquote>
+<h2 id="H264编码格式"><a href="#H264编码格式" class="headerlink" title="H264编码格式"></a>H264编码格式</h2><p><strong><font color="red">H.264 的功能分为两层：视频编码层（VCL, Video Coding Layer）和网络提取层（NAL,<br>Network Abstraction Layer）。</font></strong><br></p>
 
       
     </div>
@@ -426,6 +427,10 @@ AAC高级音频编码（英语：">
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2017/03/23/LiveDiaryFour/" rel="prev" title="直播日记-2 h264+AAC在iOS上的实现-实战篇章 硬编码">
+                直播日记-2 h264+AAC在iOS上的实现-实战篇章 硬编码 <i class="fa fa-chevron-right"></i>
+              </a>
             
           </div>
         </div>
@@ -497,7 +502,7 @@ AAC高级音频编码（英语：">
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">4</span>
+                <span class="site-state-item-count">6</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -545,7 +550,7 @@ AAC高级音频编码（英语：">
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#h264编码原理详解"><span class="nav-number">2.</span> <span class="nav-text">h264编码原理详解</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#h264的原理"><span class="nav-number">2.1.</span> <span class="nav-text">h264的原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#序列"><span class="nav-number">2.2.</span> <span class="nav-text">序列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#h264压缩方法"><span class="nav-number">2.3.</span> <span class="nav-text">h264压缩方法</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#概述"><span class="nav-number">1.</span> <span class="nav-text">概述</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#h264编码原理详解"><span class="nav-number">2.</span> <span class="nav-text">h264编码原理详解</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#h264的原理"><span class="nav-number">2.1.</span> <span class="nav-text">h264的原理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#序列"><span class="nav-number">2.2.</span> <span class="nav-text">序列</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#h264压缩方法"><span class="nav-number">2.3.</span> <span class="nav-text">h264压缩方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#H264编码格式"><span class="nav-number">2.4.</span> <span class="nav-text">H264编码格式</span></a></li></ol></li></ol></div>
             
 
           </div>
