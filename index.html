@@ -642,7 +642,12 @@
 <blockquote>
 <p>Note：<strong>有损（Lossy ）压缩和无损（Lossy less）压缩</strong>。无损压缩也即压缩前和解压缩后的数据完全一致。多数的无损压缩都采用RLE行程编码算法。有损压缩意味着解压缩后的数据与压缩前的数据不一致。在压缩的过程中要丢失一些人眼和人耳所不敏感的图像或音频信息,而且丢失的信息不可恢复。几乎所有高压缩的算法都采用有损压缩,这样才能达到低数据率的目标。丢失的数据率与压缩比有关,压缩比越小，丢失的数据越多,解压缩后的效果一般越差。此外,某些有损压缩算法采用多次重复压缩的方式,这样还会引起额外的数据丢失。</p>
 </blockquote>
-<h2 id="H264编码格式"><a href="#H264编码格式" class="headerlink" title="H264编码格式"></a>H264编码格式</h2><p><strong><font color="red">H.264 的功能分为两层：视频编码层（VCL, Video Coding Layer）和网络提取层（NAL,<br>Network Abstraction Layer）。</font></strong><br></p>
+<h2 id="H264编码格式"><a href="#H264编码格式" class="headerlink" title="H264编码格式"></a>H264编码格式</h2><p><font color="red">H.264 的功能分为两层：视频编码层（VCL, Video Coding Layer）和网络提取层（NAL,Network Abstraction Layer）。</font><br><br>VCL 数据即编码处理的输出，它表示被压缩编码后的视频数据 序列。在 VCL 数据传输或存储之前，这些编码的 VCL 数据，先被映射或封装进 NAL 单元(以下简称 NALU，Nal Unit) 中。每个 NALU 包括一个原始字节序列负荷(RBSP, Raw Byte Sequence Payload)、一组 对应于视频编码的 NALU 头部信息。RBSP 的基本结构是:在原始编码数据的后面填加了结尾 比特。一个 bit“1”若干比特“0”，以便字节对齐。<br><img src="https://github.com/jackytianhappy/ImgSource/blob/master/1073278-9e616be55d13e9af.png?raw=true" alt="Alta Text"></p>
+<p><font color="red">上图中的 NALU头 + RBSP 就相当与一个 NALU (Nal Unit),</font> 每个单元都按独立的 NALU 传送。 其实说白了，H.264 中的结构全部都是以 NALU 为主的，理解了 NALU，就理解 H.264 的结构了。</p>
+<h3 id="NALU结构详细"><a href="#NALU结构详细" class="headerlink" title="NALU结构详细"></a>NALU结构详细</h3><blockquote>
+<p>NALU如何由一帧一帧的变化而来？<br>一帧图片经过 H.264 编码器之后，就被编码为一个或多个片（slice），而装载着这些片（slice）的载体，就是 NALU 了，我们可以来看看 NALU 跟片的关系（slice）。<br><img src="https://github.com/jackytianhappy/ImgSource/blob/master/%E5%B8%A7%E5%88%87%E7%89%87.png?raw=true" alt="Alta Text"><br><img src="https://github.com/jackytianhappy/ImgSource/blob/master/%E5%B8%A7%E5%88%87%E7%89%871.png?raw=true" alt="Alta Text"><br>片（slice）的概念不同与帧（frame），帧（frame）是用作描述一张图片的，一帧（frame）对应一张图片，而片（slice），是 H.264 中提出的新概念，是通过编码图片后切分通过高效的方式整合出来的概念，一张图片至少有一个或多个片（slice）。<br><br>片（slice）都是由NALU 装载并进行网络传输的，但是这并不代表 NALU 内就一定是切片，这是充分不必要条件，因为 NALU 还有可能装载着其他用作描述视频的信息。</p>
+<h4 id="NALU"><a href="#NALU" class="headerlink" title="NALU"></a>NALU</h4><p>NALU由NAL头和RBSP组成：</p>
+</blockquote>
 
           
         
