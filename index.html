@@ -528,6 +528,14 @@ rtmp {
 <li>服务端必须等到收到C1之后才能发送S2<br></li>
 <li>服务端必须等到收到C2之后才能发送其他信息（控制信息和真实音视频等数据）<br><br>服务端收发的顺序如下：<br><br><img src="https://github.com/jackytianhappy/ImgSource/blob/master/RTMP-HandShake.png?raw=true" alt="Alt text"><br><br>理论上来讲只要满足以上条件，如何安排6个Message的顺序都是可以的，但实际实现中为了在保证握手的身份验证功能的基础上尽量减少通信的次数，一般的发送顺序是这样的，这一点可以通过wireshark抓ffmpeg推流包进行验证：<br><br>｜client｜Server ｜<br><br>｜－－－C0+C1—-&gt;|<br><br>｜&lt;－－S0+S1+S2– |<br><br>｜－－－C2-－－－&gt; ｜<br></li>
 </ul>
+<blockquote>
+<p>握手的包格式<br></p>
+<ol>
+<li>C0与S0的格式：<br><br><font color="red">c0和s0包是一个1字节,可以看作是一个byte<br></font><br>目前rtmp版本定义为3,0-2是早期的专利产品所使用的值,现已经废弃,4-31是预留值,32-255是禁用值(这样做是为了区分基于文本的协议,因为这些协议通常都是以一个可打印的字符开始),如果服务端不能识别客户请求的版本,那么它应该发送3的响应,客户端这时可以选择下降到版本3,也可以放弃这次握手<br></li>
+<li>c1与s1格式<br><br>c1与s1长度为1536个字节,它们由以下字段组成:<br><br>a. 时间戳:该字段占4字节,包含了一个时间戳,它是所有从这个端点发送出去的将来数据块的起始点,它可以是零,或是任意值,为了同步多个数据块流,端点可能会将这个字段设成其它数据块流时间戳的当前值.<br><br>0:此标记位占4字节,并且必须是0<br><br>b. 随机数:该字段占1528字节,可以是任意值,因为每个端点必须区分已经初始化的握手和对等端点初始化的握手的响应,所以这个数据要足够的随机,当然这个也不需要密码级的随机或是动态值.<br></li>
+<li>c2与s2格式<br><br>c2和s2包长都是1536字节,几乎是s1和c1的回显.<br><br>4.time1<br><br>该字段占4字节,包含有对方发送过来s1或c1的时间戳<br><br>time2<br><br>该字段占4字节,包含有对方发送过来的前一个包(s1或者c1)的时间戳<br><br>随机数回显<br><br>该字段占1528字节,包含有对方发送过来的随机数据字段,每个通信端点可以使用time1和time2字段,以及当前的时间戳,来快速估计带宽和/或连接延时,但这个数值基本上没法用.<br></li>
+</ol>
+</blockquote>
 <h3 id="3-RTMP-Chunk-Stream"><a href="#3-RTMP-Chunk-Stream" class="headerlink" title="3. RTMP Chunk Stream"></a>3. RTMP Chunk Stream</h3><p>Chunk Stream是对传输RTMP Chunk的流的逻辑上的抽象，客户端和服务器之间有关RTMP的信息都在这个流上通信。这个流上的操作也是我们关注RTMP协议的重点。</p>
 <h4 id="3-1-Message-消息"><a href="#3-1-Message-消息" class="headerlink" title="3.1 Message(消息)"></a>3.1 Message(消息)</h4><p>这里的Message是指满足该协议格式的、可以切分成Chunk发送的消息，消息包含的字段如下：<br></p>
 <ul>
