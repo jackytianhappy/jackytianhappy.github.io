@@ -97,12 +97,14 @@ Video Toolbox">
 <meta property="og:description" content="上篇已介绍了关于在iOS上编码的原理，本篇主要介绍如何实现iOS上的硬编码。通常实现编码的方式有两种，1.利用FFMpeg，利用CPU做视频的编码和解码，俗称软编，软解。但是该方法比较消耗cpu的资源。2.利用系统GPU或者专用处理器来对视频流进行编码，俗称硬编和硬解。iOS自8.0之后，系统开开放了硬件编码和解码的功能。即通过Video ToolBox框架来处理。
 
 Video Toolbox">
-<meta property="og:updated_time" content="2017-03-24T07:51:54.000Z">
+<meta property="og:image" content="https://raw.githubusercontent.com/jackytianhappy/ImgSource/8d443fa28b169bdd117829b4f95879860cd67218/%E8%A7%86%E9%A2%91H264%E7%BC%96%E8%A7%A3%E7%A0%81%E5%89%8D%E5%90%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%A4%BA%E6%84%8F%E5%9B%BE.png">
+<meta property="og:updated_time" content="2017-04-01T01:46:41.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="直播日记-3 h264+AAC在iOS上的实现-实战篇章 硬编码">
 <meta name="twitter:description" content="上篇已介绍了关于在iOS上编码的原理，本篇主要介绍如何实现iOS上的硬编码。通常实现编码的方式有两种，1.利用FFMpeg，利用CPU做视频的编码和解码，俗称软编，软解。但是该方法比较消耗cpu的资源。2.利用系统GPU或者专用处理器来对视频流进行编码，俗称硬编和硬解。iOS自8.0之后，系统开开放了硬件编码和解码的功能。即通过Video ToolBox框架来处理。
 
 Video Toolbox">
+<meta name="twitter:image" content="https://raw.githubusercontent.com/jackytianhappy/ImgSource/8d443fa28b169bdd117829b4f95879860cd67218/%E8%A7%86%E9%A2%91H264%E7%BC%96%E8%A7%A3%E7%A0%81%E5%89%8D%E5%90%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%A4%BA%E6%84%8F%E5%9B%BE.png">
 
 
 
@@ -335,8 +337,9 @@ Video Toolbox">
 <li>CMTime、CMClock和CMTImebase：时间戳相关，时间以64-bit/32-bit的形式出现</li>
 <li>CMBlockBuffer：编码后，结果的图像的数据结构</li>
 <li>CMVideoFormatDescription：图像存储方式，编解码器等格式描述。</li>
-<li>CMSampleBuffer：存放编解码前后的视频退选哪个的容器数据结构。</li>
+<li>CMSampleBuffer：存放编解码前后的视频退选哪个的容器数据结构。<br><img src="https://raw.githubusercontent.com/jackytianhappy/ImgSource/8d443fa28b169bdd117829b4f95879860cd67218/%E8%A7%86%E9%A2%91H264%E7%BC%96%E8%A7%A3%E7%A0%81%E5%89%8D%E5%90%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%A4%BA%E6%84%8F%E5%9B%BE.png" alt="Alta Text"><br>编解码前后的视频图像均封装在CMSampleBuffer中，如果是编码后的图像，以CMBlockBuffe方式存储；解码后的图像，以CVPixelBuffer存储。CMSampleBuffer里面还有另外的时间信息CMTime和视频描述信息CMVideoFormatDesc。</li>
 </ul>
+<h2 id="硬解的使用方法"><a href="#硬解的使用方法" class="headerlink" title="硬解的使用方法"></a>硬解的使用方法</h2><p>1.将网络传输的h264码流转换成视频码流，</p>
 <font color="red">未完待续</font>
 
 
@@ -521,7 +524,7 @@ Video Toolbox">
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Video-Toolbox基本数据结构"><span class="nav-number">1.</span> <span class="nav-text">Video Toolbox基本数据结构</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Video-Toolbox基本数据结构"><span class="nav-number">1.</span> <span class="nav-text">Video Toolbox基本数据结构</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#硬解的使用方法"><span class="nav-number">2.</span> <span class="nav-text">硬解的使用方法</span></a></li></ol></div>
             
 
           </div>
