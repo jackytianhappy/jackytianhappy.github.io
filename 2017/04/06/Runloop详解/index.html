@@ -103,7 +103,7 @@ Runloop概念
 NSRunLoop是iOS消息机制的处理模式:NSRunLoop的主要作用：控制NSRunLoop里面线程的执行和休眠，在有事情做的时候使当前NSRunLoop控制的线程工作，没有事情做让当前NSRunLoop的控制的线程休眠。
 
 NSRunLoop 就是一直在循环检测，从线程start到线程end，检测i">
-<meta property="og:updated_time" content="2017-04-11T03:59:29.000Z">
+<meta property="og:updated_time" content="2017-04-11T04:04:48.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Runloop详解">
 <meta name="twitter:description" content="Runloop实现了自动释放，延迟回调，触摸事件，屏幕刷新等功能。
@@ -357,6 +357,7 @@ NSRunLoop 就是一直在循环检测，从线程start到线程end，检测i">
 <li>每次运行一个run loop，你指定（显式或隐式）run loop的运行模式。当相应的模式传递给run loop时，只有与该模式对应的 input sources才被监控并允许run loop对事件进行处理（与此类似，也只有与该模式对应的observers才会被通知）</li>
 <li>子线程中的NSRunLoop需要手动启动，在子线程中使用timer要启动NSRunLoop。</li>
 </ol>
+<p><a href="http://blog.wangruofeng007.com/blog/2016/01/12/runloopxiang-jie/" target="_blank" rel="external">这里有篇不错的文章</a></p>
 
       
     </div>
