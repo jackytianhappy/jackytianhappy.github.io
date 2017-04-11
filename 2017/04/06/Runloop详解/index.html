@@ -89,20 +89,29 @@
 
 <meta name="description" content="Runloop实现了自动释放，延迟回调，触摸事件，屏幕刷新等功能。
 
-Runloop概念线程和Runloop的关系##">
+Runloop概念
+NSRunLoop是iOS消息机制的处理模式:NSRunLoop的主要作用：控制NSRunLoop里面线程的执行和休眠，在有事情做的时候使当前NSRunLoop控制的线程工作，没有事情做让当前NSRunLoop的控制的线程休眠。
+
+NSRunLoop 就是一直在循环检测，从线程start到线程end，检测i">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Runloop详解">
 <meta property="og:url" content="http://yoursite.com/2017/04/06/Runloop详解/index.html">
 <meta property="og:site_name" content="Jakcy’s Blog">
 <meta property="og:description" content="Runloop实现了自动释放，延迟回调，触摸事件，屏幕刷新等功能。
 
-Runloop概念线程和Runloop的关系##">
-<meta property="og:updated_time" content="2017-04-06T06:53:25.000Z">
+Runloop概念
+NSRunLoop是iOS消息机制的处理模式:NSRunLoop的主要作用：控制NSRunLoop里面线程的执行和休眠，在有事情做的时候使当前NSRunLoop控制的线程工作，没有事情做让当前NSRunLoop的控制的线程休眠。
+
+NSRunLoop 就是一直在循环检测，从线程start到线程end，检测i">
+<meta property="og:updated_time" content="2017-04-11T03:59:29.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Runloop详解">
 <meta name="twitter:description" content="Runloop实现了自动释放，延迟回调，触摸事件，屏幕刷新等功能。
 
-Runloop概念线程和Runloop的关系##">
+Runloop概念
+NSRunLoop是iOS消息机制的处理模式:NSRunLoop的主要作用：控制NSRunLoop里面线程的执行和休眠，在有事情做的时候使当前NSRunLoop控制的线程工作，没有事情做让当前NSRunLoop的控制的线程休眠。
+
+NSRunLoop 就是一直在循环检测，从线程start到线程end，检测i">
 
 
 
@@ -330,7 +339,24 @@ Runloop概念线程和Runloop的关系##">
         <blockquote>
 <p>Runloop实现了自动释放，延迟回调，触摸事件，屏幕刷新等功能。</p>
 </blockquote>
-<h2 id="Runloop概念"><a href="#Runloop概念" class="headerlink" title="Runloop概念"></a>Runloop概念</h2><h2 id="线程和Runloop的关系"><a href="#线程和Runloop的关系" class="headerlink" title="线程和Runloop的关系"></a>线程和Runloop的关系</h2><p>## </p>
+<h2 id="Runloop概念"><a href="#Runloop概念" class="headerlink" title="Runloop概念"></a>Runloop概念</h2><ol>
+<li><p>NSRunLoop是iOS消息机制的处理模式:<br><br>NSRunLoop的主要作用：控制NSRunLoop里面线程的执行和休眠，在有事情做的时候使当前NSRunLoop控制的线程工作，没有事情做让当前NSRunLoop的控制的线程休眠。</p>
+</li>
+<li><p>NSRunLoop 就是一直在循环检测，从线程start到线程end，检测inputsource(如点击，双击等操作)同步事件，检测timesource同步事件，检测到输入源会执行处理函数，首先会产生通知，corefunction向线程添加runloop observers来监听事件，意在监听事件发生时来做处理。</p>
+</li>
+<li><p>runloopmode是一个集合，包括监听：事件源，定时器，以及需通知的runloop observers,模式包括：<br></p>
+<p> default模式：几乎包括所有输入源(除NSConnection) NSDefaultRunLoopMode模式</p>
+<p> Modal模式：处理modal panels事件,需要等待处理的input source为modal panel时设置，比如NSSavePanel和NSOpenPanel。</p>
+<p> connection模式：处理NSConnection事件，属于系统内部，用户基本不用</p>
+<p> event tracking模式：使用该模式来处理用户界面相关的事件,例如在拖动loop或其他user interface tracking loops时处于此种模式下，在此模式下会限制输入事件的处理。例如，当手指按住UITableView拖动时就会处于此模式</p>
+<p> common modes模式：这是一个伪模式，其为一组run loop mode的集合，将输入源加入此模式意味着在Common Modes中包含的所有模式下都可以处理。在Cocoa应用程序中，默认情况下Common Modes包含default modes,modal modes,event Tracking modes, 可使用CFRunLoopAddCommonMode方法向Common Modes中添加自定义modes。</p>
+</li>
+</ol>
+<p>注意这个并不是一个特定的mode，而是一个mode的集合，而runloop必须运行在一个特定的mode下。</p>
+<ol>
+<li>每次运行一个run loop，你指定（显式或隐式）run loop的运行模式。当相应的模式传递给run loop时，只有与该模式对应的 input sources才被监控并允许run loop对事件进行处理（与此类似，也只有与该模式对应的observers才会被通知）</li>
+<li>子线程中的NSRunLoop需要手动启动，在子线程中使用timer要启动NSRunLoop。</li>
+</ol>
 
       
     </div>
@@ -501,7 +527,7 @@ Runloop概念线程和Runloop的关系##">
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Runloop概念"><span class="nav-number">1.</span> <span class="nav-text">Runloop概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#线程和Runloop的关系"><span class="nav-number">2.</span> <span class="nav-text">线程和Runloop的关系</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Runloop概念"><span class="nav-number">1.</span> <span class="nav-text">Runloop概念</span></a></li></ol></div>
             
 
           </div>
