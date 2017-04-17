@@ -71,7 +71,7 @@
 <link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
 
 
-  <meta name="keywords" content="直播," />
+  <meta name="keywords" content="多线程," />
 
 
 
@@ -87,40 +87,31 @@
 
 
 
-<meta name="description" content="最近公司业务调整，开始捣鼓直播。。。这个系列将会详细记录如何从移动端到服务端构建一套直播方案。本篇将会简单的介绍直播技术方案。
-
-整体架构
-推流端 终端：设备，手机，PC，视频录制设备终端通过音视频的采集，进行编码封装，通过rtmp协议进行传输到服务端。
-
-技术细节：1.码率、帧率根据网速自适应 2.支持不同端不用设备 3.传输高品质画面    
-
-
-云端1.云端会对终端采集到的流进行转码，支持">
+<meta name="description" content="多线程中常用的锁NSLocklock unlock
+@synchronized- (void)getIamgeName:(int)index{
+    NSString *imageName;
+    @synchronized(self) {
+        if (imageNames.count&amp;gt;0) {
+            imageName = [imageNames last">
 <meta property="og:type" content="article">
-<meta property="og:title" content="直播日记-0 技术方案简介">
-<meta property="og:url" content="http://yoursite.com/2017/03/23/直播技术方案简介/index.html">
+<meta property="og:title" content="多线程以及多线程锁">
+<meta property="og:url" content="http://yoursite.com/2017/04/12/多线程以及多线程锁/index.html">
 <meta property="og:site_name" content="Jakcy’s Blog">
-<meta property="og:description" content="最近公司业务调整，开始捣鼓直播。。。这个系列将会详细记录如何从移动端到服务端构建一套直播方案。本篇将会简单的介绍直播技术方案。
-
-整体架构
-推流端 终端：设备，手机，PC，视频录制设备终端通过音视频的采集，进行编码封装，通过rtmp协议进行传输到服务端。
-
-技术细节：1.码率、帧率根据网速自适应 2.支持不同端不用设备 3.传输高品质画面    
-
-
-云端1.云端会对终端采集到的流进行转码，支持">
-<meta property="og:updated_time" content="2017-03-23T07:39:55.000Z">
+<meta property="og:description" content="多线程中常用的锁NSLocklock unlock
+@synchronized- (void)getIamgeName:(int)index{
+    NSString *imageName;
+    @synchronized(self) {
+        if (imageNames.count&amp;gt;0) {
+            imageName = [imageNames last">
+<meta property="og:updated_time" content="2017-04-12T12:04:06.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="直播日记-0 技术方案简介">
-<meta name="twitter:description" content="最近公司业务调整，开始捣鼓直播。。。这个系列将会详细记录如何从移动端到服务端构建一套直播方案。本篇将会简单的介绍直播技术方案。
-
-整体架构
-推流端 终端：设备，手机，PC，视频录制设备终端通过音视频的采集，进行编码封装，通过rtmp协议进行传输到服务端。
-
-技术细节：1.码率、帧率根据网速自适应 2.支持不同端不用设备 3.传输高品质画面    
-
-
-云端1.云端会对终端采集到的流进行转码，支持">
+<meta name="twitter:title" content="多线程以及多线程锁">
+<meta name="twitter:description" content="多线程中常用的锁NSLocklock unlock
+@synchronized- (void)getIamgeName:(int)index{
+    NSString *imageName;
+    @synchronized(self) {
+        if (imageNames.count&amp;gt;0) {
+            imageName = [imageNames last">
 
 
 
@@ -148,13 +139,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2017/03/23/直播技术方案简介/"/>
+  <link rel="canonical" href="http://yoursite.com/2017/04/12/多线程以及多线程锁/"/>
 
 
 
 
 
-  <title> 直播日记-0 技术方案简介 | Jakcy’s Blog </title>
+  <title> 多线程以及多线程锁 | Jakcy’s Blog </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -273,7 +264,7 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/23/直播技术方案简介/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/12/多线程以及多线程锁/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Jacky Tian">
@@ -294,7 +285,7 @@
             
             
               
-                直播日记-0 技术方案简介
+                多线程以及多线程锁
               
             
           </h1>
@@ -309,8 +300,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-23T10:31:56+08:00">
-                2017-03-23
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-12T17:25:30+08:00">
+                2017-04-12
               </time>
             
 
@@ -345,23 +336,33 @@
       
 
       
-        <blockquote>
-<p>最近公司业务调整，开始捣鼓直播。。。这个系列将会详细记录如何从移动端到服务端构建一套直播方案。本篇将会简单的介绍直播技术方案。</p>
+        <h1 id="多线程中常用的锁"><a href="#多线程中常用的锁" class="headerlink" title="多线程中常用的锁"></a>多线程中常用的锁</h1><h2 id="NSLock"><a href="#NSLock" class="headerlink" title="NSLock"></a>NSLock</h2><p>lock unlock</p>
+<h2 id="synchronized"><a href="#synchronized" class="headerlink" title="@synchronized"></a>@synchronized</h2><pre><code>- (void)getIamgeName:(int)index{
+    NSString *imageName;
+    @synchronized(self) {
+        if (imageNames.count&gt;0) {
+            imageName = [imageNames lastObject];
+            [imageNames removeObject:imageName];
+        }
+    }
+}    
+</code></pre><h2 id="条件信号量dispatch-semaphore-t"><a href="#条件信号量dispatch-semaphore-t" class="headerlink" title="条件信号量dispatch_semaphore_t"></a>条件信号量dispatch_semaphore_t</h2><blockquote>
+<p>GCD中信号量，也可以解决资源抢占问题,支持信号通知和信号等待。每当发送一个信号通知，则信号量+1；每当发送一个等待信号时信号量-1,；如果信号量为0则信号会处于等待状态，直到信号量大于0开始执行。</p>
 </blockquote>
-<h1 id="整体架构"><a href="#整体架构" class="headerlink" title="整体架构"></a>整体架构</h1><ul>
-<li><p>推流端 <br><br>终端：设备，手机，PC，视频录制设备<br><br>终端通过音视频的采集，进行编码封装，通过rtmp协议进行传输到服务端。<br></p>
-<blockquote>
-<p>技术细节：1.码率、帧率根据网速自适应 2.支持不同端不用设备 3.传输高品质画面    </p>
-</blockquote>
-</li>
-<li><p>云端<br><br>1.云端会对终端采集到的流进行转码，支持不同的协议以满足不同延时的需求。<br><br>2.用户通过CDN，提高接入速度，避免跨网段访问。<br><br>3.训练神经网络，进行视频内容自动识别，包括鉴黄等。<br></p>
-</li>
-<li><p>播放端<br><br>播放终端通过收到的音视频流，进行视频解码，进行播放。</p>
-<blockquote>
-<p>技术细节：1.软硬编码结合，系统播放器,flash播放器 2.播放质量数据收集 3.协议定制，控制程序包的大小</p>
-</blockquote>
-</li>
-</ul>
+<h2 id="NSCondition"><a href="#NSCondition" class="headerlink" title="NSCondition"></a>NSCondition</h2><p>NSCondition同样实现了NSLocking协议，所以它和NSLock一样，也有NSLocking协议的lock和unlock方法，可以当做NSLock来使用解决线程同步问题，用法完全一样</p>
+<h2 id="条件锁NSConditionLock"><a href="#条件锁NSConditionLock" class="headerlink" title="条件锁NSConditionLock"></a>条件锁NSConditionLock</h2><p>也有人说这是个互斥锁NSConditionLock同样实现了NSLocking协议，试验过程中发现性能很低</p>
+<h2 id="递归锁NSRecursiveLock"><a href="#递归锁NSRecursiveLock" class="headerlink" title="递归锁NSRecursiveLock"></a>递归锁NSRecursiveLock</h2><p>有时候“加锁代码”中存在递归调用，递归开始前加锁，递归调用开始后会重复执行此方法以至于反复执行加锁代码最终造成死锁，这个时候可以使用递归锁来解决。使用递归锁可以在一个线程中反复获取锁而不造成死锁，这个过程中会记录获取锁和释放锁的次数，只有最后两者平衡锁才被最终释放。</p>
+<h2 id="NSDistributedLock"><a href="#NSDistributedLock" class="headerlink" title="NSDistributedLock"></a>NSDistributedLock</h2><p>NSDistributedLock是MAC开发中的跨进程的分布式锁，底层是用文件系统实现的互斥锁。NSDistributedLock没有实现NSLocking协议，所以没有lock方法，取而代之的是非阻塞的tryLock方法。</p>
+<pre><code>NSDistributedLock *lock = [[NSDistributedLock alloc]             initWithPath:@&quot;/Users/mac/Desktop/lock.lock&quot;];
+    while (![lock tryLock])
+    {
+        sleep(1);
+    }
+
+    //do something
+    [lock unlock];
+</code></pre><h2 id="互斥锁POSIX"><a href="#互斥锁POSIX" class="headerlink" title="互斥锁POSIX"></a>互斥锁POSIX</h2><p>POSIX和dispatch_semaphore_t很像，但是完全不同。POSIX是Unix/Linux平台上提供的一套条件互斥锁的API。<br>新建一个简单的POSIX互斥锁，引入头文件#import <pthread.h>声明并初始化一个pthread_mutex_t的结构。使用pthread_mutex_lock和pthread_mutex_unlock函数。调用pthread_mutex_destroy来释放该锁的数据结构。</pthread.h></p>
+<h2 id="GCD线程阻断dispatch-barrier-async-dispatch-barrier-sync"><a href="#GCD线程阻断dispatch-barrier-async-dispatch-barrier-sync" class="headerlink" title="GCD线程阻断dispatch_barrier_async/dispatch_barrier_sync"></a>GCD线程阻断dispatch_barrier_async/dispatch_barrier_sync</h2><p>dispatch_barrier_async/dispatch_barrier_sync在一定的基础上也可以做线程同步，会在线程队列中打断其他线程执行当前任务，也就是说只有用在并发的线程队列中才会有效，因为串行队列本来就是一个一个的执行的，你打断执行一个和插入一个是一样的效果。两个的区别是是否等待任务执行完成。</p>
 
       
     </div>
@@ -391,7 +392,7 @@
       
         <div class="post-tags">
           
-            <a href="/tags/直播/" rel="tag"># 直播</a>
+            <a href="/tags/多线程/" rel="tag"># 多线程</a>
           
         </div>
       
@@ -404,8 +405,8 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2017/03/22/From-Now-On/" rel="next" title="From Now On">
-                <i class="fa fa-chevron-left"></i> From Now On
+              <a href="/2017/04/12/Block内存地址/" rel="next" title="__Block内存地址">
+                <i class="fa fa-chevron-left"></i> __Block内存地址
               </a>
             
           </div>
@@ -413,10 +414,6 @@
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
-            
-              <a href="/2017/03/23/直播中常用的协议简介/" rel="prev" title="直播日记-1 直播中常用的协议简介">
-                直播日记-1 直播中常用的协议简介 <i class="fa fa-chevron-right"></i>
-              </a>
             
           </div>
         </div>
@@ -536,7 +533,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#整体架构"><span class="nav-number">1.</span> <span class="nav-text">整体架构</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#多线程中常用的锁"><span class="nav-number">1.</span> <span class="nav-text">多线程中常用的锁</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#NSLock"><span class="nav-number">1.1.</span> <span class="nav-text">NSLock</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#synchronized"><span class="nav-number">1.2.</span> <span class="nav-text">@synchronized</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#条件信号量dispatch-semaphore-t"><span class="nav-number">1.3.</span> <span class="nav-text">条件信号量dispatch_semaphore_t</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NSCondition"><span class="nav-number">1.4.</span> <span class="nav-text">NSCondition</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#条件锁NSConditionLock"><span class="nav-number">1.5.</span> <span class="nav-text">条件锁NSConditionLock</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#递归锁NSRecursiveLock"><span class="nav-number">1.6.</span> <span class="nav-text">递归锁NSRecursiveLock</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#NSDistributedLock"><span class="nav-number">1.7.</span> <span class="nav-text">NSDistributedLock</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#互斥锁POSIX"><span class="nav-number">1.8.</span> <span class="nav-text">互斥锁POSIX</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GCD线程阻断dispatch-barrier-async-dispatch-barrier-sync"><span class="nav-number">1.9.</span> <span class="nav-text">GCD线程阻断dispatch_barrier_async/dispatch_barrier_sync</span></a></li></ol></li></ol></div>
             
 
           </div>
