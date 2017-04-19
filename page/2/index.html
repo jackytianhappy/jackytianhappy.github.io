@@ -247,6 +247,171 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/23/h264+AAC在iOS上的实现-原理篇章/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jacky Tian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jakcy’s Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/03/23/h264+AAC在iOS上的实现-原理篇章/" itemprop="url">
+                  直播日记-2 h264+AAC在iOS上的实现-原理篇章
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-23T15:51:48+08:00">
+                2017-03-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <blockquote>
+<p>为什么要使用h264+AAC去编码？因为HLS是社交类直播APP的刚需，使用HLS必须通过h264+AAC的编码去实现</p>
+</blockquote>
+<h1 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h1><ul>
+<li><p>H.264<br><br>H.264，又称为MPEG-4第10部分，高级视频编码（英语：MPEG-4 Part 10, Advanced Video Coding，缩写为MPEG-4 AVC）是一种面向块的基于运动补偿的视频编码标准.<a href="https://zh.wikipedia.org/wiki/H.264/MPEG-4_AVC" target="_blank" rel="external"> Form wiki </a></p>
+</li>
+<li><p>AAC<br><br>高级音频编码（英语：Advanced Audio Coding，AAC），出现于1997年，基于MPEG-2的音频编码技术。<a href="https://zh.wikipedia.org/wiki/%E9%80%B2%E9%9A%8E%E9%9F%B3%E8%A8%8A%E7%B7%A8%E7%A2%BC" target="_blank" rel="external">From wiki</a></p>
+<p> AAC编码的主要扩展名有三种：.aac .mp4 .m4a</p>
+</li>
+</ul>
+<h1 id="h264编码原理详解"><a href="#h264编码原理详解" class="headerlink" title="h264编码原理详解"></a>h264编码原理详解</h1><h2 id="h264的原理"><a href="#h264的原理" class="headerlink" title="h264的原理"></a>h264的原理</h2><p>H264是一种新的基于运动补偿的视频编码标准。据统计，一组连续的画面中，有差别的点只在10%以内，亮度的变化差值不超过2%，色度变化的差值不超过1%。<br><strong>因此，对于一段变化不大的图像画面，我们可以先编码出完整的图像A帧，随后的B帧就不编码全部的图像，只编码与A有差别的部分，这样B的大小就只要A的十分之一，甚至更小</strong>。<br><br>B帧之后的C帧如果变化不大，我们可以继续以参考B的方式编码C帧，这样循环下去。<br><br><strong>这段图像我们称为一个<font color="red">序列</font>（序列就是有相同特点的一段数据）</strong>,当某个图像与之前的图像变化很大，无法参考前面的帧来生成，那我们就结束上一个序列，开始下一段序列，也就是对这个图像生成一个完整帧A1，随后的图像就参考A1生成，只写入与A1的差别内容。</p>
+<h2 id="序列"><a href="#序列" class="headerlink" title="序列"></a>序列</h2><blockquote>
+<p>上小节提出了序列的概念。为了能够更好的了解序列，我们需要知道这样的几个概念</p>
+</blockquote>
+<ul>
+<li><p>I帧 <br><br>1.它是一个全帧压缩编码帧。它将全帧图像信息进行JPEG压缩编码及传输; <br><br>2.解码时仅用I帧的数据就可重构完整图像; <br><br>3.I帧描述了图像背景和运动主体的详情;<br><br>4.I帧不需要参考其他画面而生成; <br><br>5.I帧是P帧和B帧的参考帧(其质量直接影响到同组中以后各帧的质量); <br><br>6.I帧是帧组GOP的基础帧(第一帧),在一组中只有一个I帧; <br><br>7.I帧不需要考虑运动矢量; <br><br>8.I帧所占数据的信息量比较大。<br></p>
+</li>
+<li><p>P帧<br><br>前向预测编码帧。P帧表示的是这一帧跟之前的一个关键帧（或P帧）的差别，解码时需要用之前缓存的画面叠加上本帧定义的差别，生成最终画面。（也就是差别帧，P帧没有完整画面数据，只有与前一帧的画面差别的数据）。<br><br><font color="green">P帧的预测与重构:</font>P帧是以I帧为参考帧,在I帧中找出P帧“某点”的预测值和运动矢量,取预测差值和运动矢量一起传送。在接收端根据运动矢量从I帧中找出P帧“某点”的预测值并与差值相加以得到P帧“某点”样值,从而可得到完整的P帧。<br><br><font color="green">P帧特点:</font> <br><br>1.P帧是I帧后面相隔1~2帧的编码帧; <br><br>2.P帧采用运动补偿的方法传送它与前面的I或P帧的差值及运动矢量(预测误差); <br><br>3.解码时必须将I帧中的预测值与预测误差求和后才能重构完整的P帧图像; <br><br>4.P帧属于前向预测的帧间编码。它只参考前面最靠近它的I帧或P帧; <br><br>5.P帧可以是其后面P帧的参考帧,也可以是其前后的B帧的参考帧; <br><br>6.由于P帧是参考帧,它可能造成解码错误的扩散; <br><br>7.由于是差值传送,P帧的压缩比较高。 <br></p>
+</li>
+<li><p>B帧<br><br>双向预测内插编码帧。B帧是双向差别帧，也就是B帧记录的是本帧与前后帧的差别，换言之，要解码B帧，不仅要取得之前的缓存画面，还要解码之后的画面，通过前后画面的与本帧数据的叠加取得最终的画面。B帧压缩率高，但是解码时CPU会比较累。<br><br><font color="green">B帧的预测与重构:</font>B帧以前面的I或P帧和后面的P帧为参考帧,“找出”B帧“某点”的预测值和两个运动矢量,并取预测差值和运动矢量传送。接收端根据运动矢量在两个参考帧中“找出(算出)”预测值并与差值求和,得到B帧“某点”样值,从而可得到完整的B帧。<br><br><font color="green">B帧特点:</font><br>1.B帧是由前面的I或P帧和后面的P帧来进行预测的;<br>2.B帧传送的是它与前面的I或P帧和后面的P帧之间的预测误差及运动矢量;<br>3.B帧是双向预测编码帧;<br>4.B帧压缩比最高,因为它只反映丙参考帧间运动主体的变化情况,预测比较准确;<br>5.B帧不是参考帧,不会造成解码错误的扩散。 </p>
+</li>
+</ul>
+<blockquote>
+<p>Note:I、B、P各帧是根据压缩算法的需要，是人为定义的,它们都是实实在在的物理帧。一般来说，<font color="red"><br>I帧的压缩率是7（跟JPG差不多），P帧是20，B帧可以达到50。</font>可见使用B帧能节省大量空间，节省出来的空间可以用来保存多一些I帧，这样在相同码率下，可以提供更好的画质。</p>
+</blockquote>
+<h2 id="h264压缩方法"><a href="#h264压缩方法" class="headerlink" title="h264压缩方法"></a>h264压缩方法</h2><blockquote>
+<p>以上的概念介绍几本阐述了h264的压缩算法.<br></p>
+</blockquote>
+<ul>
+<li>分组:把几帧图像分为一组(GOP，也就是一个序列),为防止运动变化,帧数不宜取多。 </li>
+<li>定义帧:将每组内各帧图像定义为三种类型,即I帧、B帧和P帧; </li>
+<li>预测帧:以I帧做为基础帧,以I帧预测P帧,再由I帧和P帧预测B帧; </li>
+<li>数据传输:最后将I帧数据与预测的差值信息进行存储和传输。</li>
+</ul>
+<p><strong>帧内（Intraframe）压缩</strong>也称为空间压缩（Spatial compression）。当压缩一帧图像时，仅考虑本帧的数据而不考虑相邻帧之间的冗余信息，这实际上与静态图像压缩类似。帧内一般采用有损压缩算法，由于帧内压缩是编码一个完整的图像，所以可以独立的解码、显示。帧内压缩一般达不到很高的压缩，跟编码jpeg差不多。<br></p>
+<p> <strong>帧间（Interframe）压缩的原理</strong>是：相邻几帧的数据有很大的相关性，或者说前后两帧信息变化很小的特点。也即连续的视频其相邻帧之间具有冗余信息,根据这一特性，压缩相邻帧之间的冗余量就可以进一步提高压缩量，减小压缩比。帧间压缩也称为时间压缩（Temporal compression），它通过比较时间轴上不同帧之间的数据进行压缩。帧间压缩一般是无损的。帧差值（Frame differencing）算法是一种典型的时间压缩法，它通过比较本帧与相邻帧之间的差异，仅记录本帧与其相邻帧的差值，这样可以大大减少数据量</p>
+<blockquote>
+<p>Note：<strong>有损（Lossy ）压缩和无损（Lossy less）压缩</strong>。无损压缩也即压缩前和解压缩后的数据完全一致。多数的无损压缩都采用RLE行程编码算法。有损压缩意味着解压缩后的数据与压缩前的数据不一致。在压缩的过程中要丢失一些人眼和人耳所不敏感的图像或音频信息,而且丢失的信息不可恢复。几乎所有高压缩的算法都采用有损压缩,这样才能达到低数据率的目标。丢失的数据率与压缩比有关,压缩比越小，丢失的数据越多,解压缩后的效果一般越差。此外,某些有损压缩算法采用多次重复压缩的方式,这样还会引起额外的数据丢失。</p>
+</blockquote>
+<h2 id="H264编码格式"><a href="#H264编码格式" class="headerlink" title="H264编码格式"></a>H264编码格式</h2><p><font color="red">H.264 的功能分为两层：视频编码层（VCL, Video Coding Layer）和网络提取层（NAL,Network Abstraction Layer）。</font><br><br>VCL 数据即编码处理的输出，它表示被压缩编码后的视频数据 序列。在 VCL 数据传输或存储之前，这些编码的 VCL 数据，先被映射或封装进 NAL 单元(以下简称 NALU，Nal Unit) 中。每个 NALU 包括一个原始字节序列负荷(RBSP, Raw Byte Sequence Payload)、一组 对应于视频编码的 NALU 头部信息。RBSP 的基本结构是:在原始编码数据的后面填加了结尾 比特。一个 bit“1”若干比特“0”，以便字节对齐。<br><img src="https://github.com/jackytianhappy/ImgSource/blob/master/1073278-9e616be55d13e9af.png?raw=true" alt="Alta Text"></p>
+<p><font color="red">上图中的 NALU头 + RBSP 就相当与一个 NALU (Nal Unit),</font> 每个单元都按独立的 NALU 传送。 其实说白了，H.264 中的结构全部都是以 NALU 为主的，理解了 NALU，就理解 H.264 的结构了。</p>
+<h3 id="NALU结构详细"><a href="#NALU结构详细" class="headerlink" title="NALU结构详细"></a>NALU结构详细</h3><blockquote>
+<p>NALU如何由一帧一帧的变化而来？<br>一帧图片经过 H.264 编码器之后，就被编码为一个或多个片（slice），而装载着这些片（slice）的载体，就是 NALU 了，我们可以来看看 NALU 跟片的关系（slice）。<br><img src="https://github.com/jackytianhappy/ImgSource/blob/master/%E5%B8%A7%E5%88%87%E7%89%87.png?raw=true" alt="Alta Text"><br><img src="https://github.com/jackytianhappy/ImgSource/blob/master/%E5%B8%A7%E5%88%87%E7%89%871.png?raw=true" alt="Alta Text"><br>片（slice）的概念不同与帧（frame），帧（frame）是用作描述一张图片的，一帧（frame）对应一张图片，而片（slice），是 H.264 中提出的新概念，是通过编码图片后切分通过高效的方式整合出来的概念，一张图片至少有一个或多个片（slice）。<br><br>片（slice）都是由NALU 装载并进行网络传输的，但是这并不代表 NALU 内就一定是切片，这是充分不必要条件，因为 NALU 还有可能装载着其他用作描述视频的信息。</p>
+<h4 id="NALU"><a href="#NALU" class="headerlink" title="NALU"></a>NALU</h4><p>NALU由NAL头和RBSP组成：</p>
+</blockquote>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/23/直播中常用的协议简介/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -711,7 +876,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-count">14</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -724,7 +889,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">7</span>
+                <span class="site-state-item-count">8</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
