@@ -247,6 +247,195 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/19/ReactNative原理详解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jacky Tian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jakcy’s Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/04/19/ReactNative原理详解/" itemprop="url">
+                  ReactNative原理详解
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-19T17:27:31+08:00">
+                2017-04-19
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <blockquote>
+<p>背景介绍：iOS APP审核周期长，通过简易的JSON配置能够去渲染不同的界面，进而实现动态页面的配置</p>
+</blockquote>
+<h1 id="React-Native"><a href="#React-Native" class="headerlink" title="React Native"></a>React Native</h1><p>React Native是前端和移动端的融合</p>
+<h2 id="融合"><a href="#融合" class="headerlink" title="融合"></a>融合</h2><p>移动端通过 JSON 文件传递信息的不足之处：只能传递配置信息，无法表达逻辑。从本质上讲，这是因为 JSON 毕竟只是纯文本，它缺乏像编程语言那样的运行能力。</p>
+<p>而 React 在前端取得突破性成功以后，JavaScript 布道者们开始试图一统三端。他们利用了移动平台能够运行 JavaScript 代码的能力，并且发挥了 JavaScript 不仅仅可以传递配置信息，还可以表达逻辑信息的优点。</p>
+<p>当痛点遇上特点，两者一拍即合，于是乎：</p>
+<blockquote>
+<p>一个基于 JavaScript，具备动态配置能力，面向前端开发者的移动端开发框架，React Native，诞生了！</p>
+</blockquote>
+<h2 id="原理概述"><a href="#原理概述" class="headerlink" title="原理概述"></a>原理概述</h2><p>React Native 不是黑科技，我们写的代码总是以一种非常合理，可以解释的方式的运行着，只是绝大多数人没有理解而已。接下来我以 iOS 平台为例，简单的解释一下 React Native 的原理。</p>
+<p>首先要明白的一点是，即使使用了 React Native，我们依然需要 UIKit 等框架，调用的是 Objective-C 代码。总之，JavaScript 只是辅助，它只是提供了配置信息和逻辑的处理结果。React Native 与 Hybrid 完全没有关系，它只不过是以 JavaScript 的形式告诉 Objective-C 该执行什么代码。</p>
+<p>其次，React Native 能够运行起来，全靠 Objective-C 和 JavaScript 的交互。对于没有接触过 JavaScript 的人来说，非常有必要理解 JavaScript 代码如何被执行。</p>
+<p> C 系列的语言，经过编译，链接等操作后，会得到一个二进制格式的可执行文，所谓的运行程序，其实是运行这个二进制程序。</p>
+<p> 苹果提供了一个叫做 JavaScript Core 的框架，这是一个 JavaScript 引擎。通过下面这段代码可以简单的感受一下 Objective-C 如何调用 JavaScript 代码：</p>
+<pre><code> JSContext *context = [[JSContext alloc] init];
+JSValue *jsVal = [context evaluateScript:@&quot;21+7&quot;];
+int iVal = [jsVal toInt32];
+</code></pre><p>JavaScript 是一种单线程的语言，它不具备自运行的能力，因此总是被动调用。很多介绍 React Native 的文章都会提到 “JavaScript 线程” 的概念，实际上，它表示的是 Objective-C 创建了一个单独的线程，这个线程只用于执行 JavaScript 代码，而且 JavaScript 代码只会在这个线程中执行。</p>
+<h1 id="Objective-C-与-JavaScript-交互"><a href="#Objective-C-与-JavaScript-交互" class="headerlink" title="Objective-C 与 JavaScript 交互"></a>Objective-C 与 JavaScript 交互</h1><p>提到 Objective-C 与 JavaScript 的交互，不得不推荐 bang神的这篇文章：<a href="http://blog.cnbang.net/tech/2698/" target="_blank" rel="external">React Native通信机制详解</a> 。虽然其中不少细节都已经过时，但是整体的思路值得学习。</p>
+<p>本节主要分析 Objective-C 与 JavaScript 交互时的整理逻辑与流程，下一节将通过源码来分析具体原理。</p>
+<h2 id="JavaScript-调用-Objective-C"><a href="#JavaScript-调用-Objective-C" class="headerlink" title="JavaScript 调用 Objective-C"></a>JavaScript 调用 Objective-C</h2><p>由于 JavaScript Core 是一个面向 Objective-C 的框架，在 Objective-C 这一端，我们对 JavaScript 上下文知根知底，可以很容易的获取到对象，方法等各种信息，当然也包括调用 JavaScript 函数。</p>
+<p>真正复杂的问题在于，JavaScript 不知道 Objective-C 有哪些方法可以调用。</p>
+<p>React Native 解决这个问题的方案是在 Objective-C 和 JavaScript 两端都保存了一份配置表，里面标记了所有 Objective-C 暴露给 JavaScript 的模块和方法。这样，无论是哪一方调用另一方的方法，实际上传递的数据只有 ModuleId、MethodId 和 Arguments 这三个元素，它们分别表示类、方法和方法参数，当 Objective-C 接收到这三个值后，就可以通过 runtime 唯一确定要调用的是哪个函数，然后调用这个函数。</p>
+<p>上述解决方案只是一个抽象概念，可能与实际的解决方案有微小差异，比如实际上 Objective-C 这一端，并没有直接保存这个模块配置表。具体实现将在下一节中随着源码一起分析。</p>
+<h2 id="闭包与回调"><a href="#闭包与回调" class="headerlink" title="闭包与回调"></a>闭包与回调</h2><p>既然说到函数互调，那么就不得不提到回调了。对于 Objective-C 来说，执行完 JavaScript 代码再执行 Objective-C 回调毫无难度，难点依然在于 JavaScript 代码调用 Objective-C 之后，如何在 Objective-C 的代码中，回调执行 JavaScript 代码。</p>
+<p>目前 React Native 的做法是：在 JavaScript 调用 Objective-C 代码时，注册要回调的 Block，并且把 BlockId 作为参数发送给 Objective-C，Objective-C 收到参数时会创建 Block，调用完 Objective-C 函数后就会执行这个刚刚创建的 Block。</p>
+<p>Objective-C 会向 Block 中传入参数和 BlockId，然后在 Block 内部调用 JavaScript 的方法，随后 JavaScript 查找到当时注册的 Block 并执行。</p>
+<h2 id="图解"><a href="#图解" class="headerlink" title="图解"></a>图解</h2><p><img src="https://github.com/jackytianhappy/ImgSource/blob/master/ReactNative%E5%8E%9F%E7%90%86.png?raw=true" alt="Alta"></p>
+<h1 id="React-Native-源码分析"><a href="#React-Native-源码分析" class="headerlink" title="React Native 源码分析"></a>React Native 源码分析</h1><p>要想深入理解 React Native 的工作原理，有两个部分有必要阅读一下，分别是初始化阶段和方法调用阶段。</p>
+<h2 id="初始化React-Native"><a href="#初始化React-Native" class="headerlink" title="初始化React Native"></a>初始化React Native</h2><p>每个项目都有一个入口，然后进行初始化操作，React Native 也不例外。一个不含 Objective-C 代码的项目留给我们的唯一线索就是位于 AppDelegate 文件中的代码：</p>
+<pre><code>RCTRootView *rootView = [[RCTRootView alloc] initWithBundleURL:jsCodeLocation moduleName:@&quot;PropertyFinder&quot; initialProperties:nil launchOptions:launchOptions];    
+</code></pre><p>用户能看到的一切内容都来源于这个 RootView，所有的初始化工作也都在这个方法内完成。</p>
+<p>在这个方法内部，在创建 RootView 之前，React Native 实际上先创建了一个 Bridge 对象。它是 Objective-C 与 JavaScript 交互的桥梁，后续的方法交互完全依赖于它，而整个初始化过程的最终目的其实也就是创建这个桥梁对象。</p>
+<p>初始化方法的核心是 setUp 方法，而 setUp 方法的主要任务则是创建 BatchedBridge。</p>
+<p>BatchedBridge 的作用是批量读取 JavaScript 对 Objective-C 的方法调用，同时它内部持有一个 JavaScriptExecutor，顾名思义，这个对象用来执行 JavaScript 代码。</p>
+<p>创建 BatchedBridge 的关键是 start 方法，它可以分为五个步骤：</p>
+<ol>
+<li>读取 JavaScript 源码</li>
+<li>初始化模块信息</li>
+<li>初始化 JavaScript 代码的执行器，即 RCTJSCExecutor 对象</li>
+<li>生成模块列表并写入 JavaScript 端</li>
+<li>执行 JavaScript 源码</li>
+</ol>
+<h3 id="读取-JavaScript-源码"><a href="#读取-JavaScript-源码" class="headerlink" title="读取 JavaScript 源码"></a>读取 JavaScript 源码</h3><p>这一部分的具体代码实现没有太大的讨论意义。我们只要明白，JavaScript 的代码是在 Objective-C 提供的环境下运行的，所以第一步就是把 JavaScript 加载进内存中，对于一个空的项目来说，所有的 JavaScript 代码大约占用 1.5 Mb 的内存空间。</p>
+<p>需要说明的是，在这一步中，JSX 代码已经被转化成原生的 JavaScript 代码。</p>
+<h3 id="初始化模块信息"><a href="#初始化模块信息" class="headerlink" title="初始化模块信息"></a>初始化模块信息</h3><p>这一步在方法 initModulesWithDispatchGroup: 中实现，主要任务是找到所有需要暴露给 JavaScript 的类。每一个需要暴露给 JavaScript 的类(也成为 Module，以下不作区分)都会标记一个宏：RCT_EXPORT_MODULE，这个宏的具体实现并不复杂：</p>
+<pre><code>#define RCT_EXPORT_MODULE(js_name) \
+RCT_EXTERN void RCTRegisterModule(Class); \
++ (NSString *)moduleName { return @#js_name; } \
++ (void)load { RCTRegisterModule(self); }
+</code></pre><p>这样，这个类在 load 方法中就会调用 RCTRegisterModule 方法注册自己：</p>
+<pre><code>    void RCTRegisterModule(Class moduleClass)
+{
+  static dispatch_once_t onceToken;
+  dispatch_once(&amp;onceToken, ^{
+    RCTModuleClasses = [NSMutableArray new];
+  });
+
+  [RCTModuleClasses addObject:moduleClass];
+}
+</code></pre><p>因此，React Native 可以通过 RCTModuleClasses 拿到所有暴露给 JavaScript 的类。下一步操作是遍历这个数组，然后生成 RCTModuleData 对象：</p>
+<pre><code>for (Class moduleClass in RCTGetModuleClasses()) {
+    RCTModuleData *moduleData = [[RCTModuleData alloc]initWithModuleClass:moduleClass                                                                      bridge:self];
+    [moduleClassesByID addObject:moduleClass];
+    [moduleDataByID addObject:moduleData];
+}
+</code></pre><p>可以想见，RCTModuleData 对象是模块配置表的主要组成部分。如果把模块配置表想象成一个数组，那么每一个元素就是一个 RCTModuleData 对象。</p>
+<p><a href="http://www.jianshu.com/p/978c4bd3a759" target="_blank" rel="external">参见原文地址</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/18/WKWebview和UIWebView/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2522,147 +2711,6 @@ rtmp {
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/23/h264+AAC在iOS上的实现-实战篇章 硬编码/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Jacky Tian">
-      <meta itemprop="description" content="">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="Jakcy’s Blog">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h1 class="post-title" itemprop="name headline">
-            
-            
-              
-                
-                <a class="post-title-link" href="/2017/03/23/h264+AAC在iOS上的实现-实战篇章 硬编码/" itemprop="url">
-                  直播日记-3 h264+AAC在iOS上的实现-实战篇章 硬编码
-                </a>
-              
-            
-          </h1>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-23T21:44:43+08:00">
-                2017-03-23
-              </time>
-            
-
-            
-
-            
-          </span>
-
-          
-
-          
-            
-          
-
-          
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          
-            <blockquote>
-<p>上篇已介绍了关于在iOS上编码的原理，本篇主要介绍如何实现iOS上的硬编码。通常实现编码的方式有两种，1.利用FFMpeg，利用CPU做视频的编码和解码，俗称软编，软解。但是该方法比较消耗cpu的资源。2.利用系统GPU或者专用处理器来对视频流进行编码，俗称硬编和硬解。<br><br>iOS自8.0之后，系统开开放了硬件编码和解码的功能。即通过Video ToolBox框架来处理。</p>
-</blockquote>
-<h2 id="Video-Toolbox基本数据结构"><a href="#Video-Toolbox基本数据结构" class="headerlink" title="Video Toolbox基本数据结构"></a>Video Toolbox基本数据结构</h2><ul>
-<li>CVPixelBuffer:编码前和编码后的图像的数据结构</li>
-<li>CMTime、CMClock和CMTImebase：时间戳相关，时间以64-bit/32-bit的形式出现</li>
-<li>CMBlockBuffer：编码后，结果的图像的数据结构</li>
-<li>CMVideoFormatDescription：图像存储方式，编解码器等格式描述。</li>
-<li>CMSampleBuffer：存放编解码前后的视频退选哪个的容器数据结构。<br><img src="https://raw.githubusercontent.com/jackytianhappy/ImgSource/8d443fa28b169bdd117829b4f95879860cd67218/%E8%A7%86%E9%A2%91H264%E7%BC%96%E8%A7%A3%E7%A0%81%E5%89%8D%E5%90%8E%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E7%A4%BA%E6%84%8F%E5%9B%BE.png" alt="Alta Text"><br>编解码前后的视频图像均封装在CMSampleBuffer中，如果是编码后的图像，以CMBlockBuffe方式存储；解码后的图像，以CVPixelBuffer存储。CMSampleBuffer里面还有另外的时间信息CMTime和视频描述信息CMVideoFormatDesc。</li>
-</ul>
-<h2 id="硬解的使用方法"><a href="#硬解的使用方法" class="headerlink" title="硬解的使用方法"></a>硬解的使用方法</h2><p>1.将网络传输的h264码流转换成视频码流，</p>
-<font color="red">未完待续</font>
-
-
-
-
-
-
-
-
-
-
-          
-        
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <div>
-      
-    </div>
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </article>
-
-
-    
   </section>
 
   
@@ -2712,7 +2760,7 @@ rtmp {
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-count">15</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2725,7 +2773,7 @@ rtmp {
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">8</span>
+                <span class="site-state-item-count">9</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
