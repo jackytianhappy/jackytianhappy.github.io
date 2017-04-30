@@ -247,6 +247,200 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/28/nginx安装篇/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jacky Tian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jakcy’s Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/03/28/nginx安装篇/" itemprop="url">
+                  nginx rtmp 安装篇
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-03-28T16:55:00+08:00">
+                2017-03-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h2 id="nginx"><a href="#nginx" class="headerlink" title="nginx"></a>nginx</h2><p>（发音同engine x）是一个网页服务器，它能反向代理HTTP, HTTPS, SMTP, POP3, IMAP的协议链接，以及一个负载均衡器和一个HTTP缓存。</p>
+<h3 id="nginx-rtmp安装教程"><a href="#nginx-rtmp安装教程" class="headerlink" title="nginx rtmp安装教程"></a>nginx rtmp安装教程</h3><p>通过神器homebrew安装</p>
+<ul>
+<li>brew update 更新本地brew</li>
+<li>brew install homebrew/nginx/nginx-full –with-rtmp-module<br>nginx-full代码nginx的完整版</li>
+<li>查看安装后的信息brew info nginx-full</li>
+</ul>
+<h3 id="修改nginx的配置文件"><a href="#修改nginx的配置文件" class="headerlink" title="修改nginx的配置文件"></a>修改nginx的配置文件</h3><blockquote>
+<p>通过以上nginx后的配置文件路径在/usr/local/etc/nginx下<br>修改配置文件为以下（去掉了注释部分）<br></p>
+</blockquote>
+<pre><code>    #user  nobody;
+    worker_processes  1;
+
+    error_log  logs/error.log debug;
+
+    events {
+        worker_connections  1024;
+    }
+
+    http {
+        include       mime.types;
+        default_type  application/octet-stream;
+
+        sendfile        on;
+        keepalive_timeout  65;
+
+        server {
+            listen       8080;
+            server_name  localhost;
+
+            # rtmp stat
+            location /stat {
+                rtmp_stat all;
+                rtmp_stat_stylesheet stat.xsl;
+            }
+            location /stat.xsl {
+                # 这个路径一定要改
+                root /usr/local/Cellar/rtmp-nginx-module/1.1.7.9/share/rtmp-nginx-module;
+            }
+
+            # rtmp control
+            location /control {
+                rtmp_control all;
+            }
+
+            error_page   500 502 503 504  /50x.html;
+            location = /50x.html {
+                root   html;
+            }
+        }
+}
+
+rtmp {
+    server {
+        listen 1935;
+        ping 30s;
+        notify_method get;
+
+        application myapp {
+            live on;
+        }
+    }
+}
+</code></pre><p> 编辑之后通过sudo nginx -s reload重启nginx。<br> 启动方式，进入ngix的目录，如我安装的目录：/usr/local/Cellar/nginx-full/1.10.3/bin 启动 sudo ./nginx</p>
+<h2 id="ffmpeg安装"><a href="#ffmpeg安装" class="headerlink" title="ffmpeg安装"></a>ffmpeg安装</h2><h3 id="ffmpeg安装教程"><a href="#ffmpeg安装教程" class="headerlink" title="ffmpeg安装教程"></a>ffmpeg安装教程</h3><ol>
+<li>brew unlink ffmpeg</li>
+<li><p>brew install ffmpeg –with-ffplay</p>
+</li>
+<li><p>访问 <a href="http://localhost:8080/stat，如果正常打开，表示你已经成功了一大半" target="_blank" rel="external">http://localhost:8080/stat，如果正常打开，表示你已经成功了一大半</a></p>
+</li>
+<li>cd /System/Library/Compositions/</li>
+<li>ffmpeg -re -i Yosemite.mov -c copy -f flv rtmp://localhost/myapp/mystream</li>
+<li>ffplay rtmp://localhost/myapp/mystream<br>开始可能会出现如下的连接错误<br>Connection to tcp://localhost:1935 failed (Connection refused), trying next address</li>
+</ol>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/03/24/RTMP原理/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1635,7 +1829,7 @@
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">16</span>
+                <span class="site-state-item-count">17</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -1648,7 +1842,7 @@
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">10</span>
+                <span class="site-state-item-count">11</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>
