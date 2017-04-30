@@ -341,7 +341,7 @@
 <font color="red">@property (nonatomic/atomic, assign/retain/strong/weak/unsafe_unretained/copy,readonly/readwrite) Number* num;</font>
 
 <p>其中assign/retain/copy与MRC下property的标识符意义相同，strong类似与retain,assign类似于unsafe_unretained，strong/weak/unsafe_unretained与ARC下变量标识符意义相同，只是一个用于属性的标识，一个用于变量的标识(带两个下划短线__)。所列出的其他的标识符与MRC下意义相同。</p>
-<h1 id="自动释放池"><a href="#自动释放池" class="headerlink" title="自动释放池"></a>自动释放池</h1><h2 id="Autorelease对象什么时候释放？"><a href="#Autorelease对象什么时候释放？" class="headerlink" title="Autorelease对象什么时候释放？"></a>Autorelease对象什么时候释放？</h2><p><a href="http://blog.sunnyxx.com/2014/10/15/behind-autorelease/" target="_blank" rel="external">sunny关于Autorelease详解</a></p>
+<h1 id="自动释放池"><a href="#自动释放池" class="headerlink" title="自动释放池"></a>自动释放池</h1><h2 id="Autorelease对象什么时候释放？"><a href="#Autorelease对象什么时候释放？" class="headerlink" title="Autorelease对象什么时候释放？"></a>Autorelease对象什么时候释放？</h2><p><a href="http://blog.sunnyxx.com/2014/10/15/behind-autorelease/" target="_blank" rel="external">sunny关于Autorelease详解</a><br>关于文章里的demo和文章不相匹配的问题，这边重新写了个demo，证明viewdidappear和viewdidload确实是在两个不同的runloop里面。<br><a href="https://github.com/jackytianhappy/LearingiOSDemo/tree/master/MemoryDemo" target="_blank" rel="external">Jacky’s Demo</a></p>
 
           
         
