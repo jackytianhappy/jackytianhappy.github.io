@@ -88,21 +88,27 @@
 
 
 <meta name="description" content="load和initialize的区别load调用时机load方法在文件被程序加载的时候调用，只要文件在compile source中出现文件就会被记载，因此load方法会在main函数之前被调用。
-调用规则load方法调用，首先会调用父的load方法，并且不需要手动去掉用，也就是说不需要super方法。即使自己实现了load方法，依旧会先去调用父类的load方法。
-initialize调用时机这个">
+
+note:Q: 重载自己 Class 的 +load 方法时需不需要调父类？A: runtime 负责按继承顺序递归调用，所以我们不能调 super
+
+调用规则load方法调用，首先会调用父的load">
 <meta property="og:type" content="article">
 <meta property="og:title" content="iOS常用知识点汇总">
 <meta property="og:url" content="http://yoursite.com/2017/05/12/iOS常用知识点汇总/index.html">
 <meta property="og:site_name" content="Jakcy’s Blog">
 <meta property="og:description" content="load和initialize的区别load调用时机load方法在文件被程序加载的时候调用，只要文件在compile source中出现文件就会被记载，因此load方法会在main函数之前被调用。
-调用规则load方法调用，首先会调用父的load方法，并且不需要手动去掉用，也就是说不需要super方法。即使自己实现了load方法，依旧会先去调用父类的load方法。
-initialize调用时机这个">
-<meta property="og:updated_time" content="2017-05-12T08:57:28.000Z">
+
+note:Q: 重载自己 Class 的 +load 方法时需不需要调父类？A: runtime 负责按继承顺序递归调用，所以我们不能调 super
+
+调用规则load方法调用，首先会调用父的load">
+<meta property="og:updated_time" content="2017-05-12T09:11:11.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="iOS常用知识点汇总">
 <meta name="twitter:description" content="load和initialize的区别load调用时机load方法在文件被程序加载的时候调用，只要文件在compile source中出现文件就会被记载，因此load方法会在main函数之前被调用。
-调用规则load方法调用，首先会调用父的load方法，并且不需要手动去掉用，也就是说不需要super方法。即使自己实现了load方法，依旧会先去调用父类的load方法。
-initialize调用时机这个">
+
+note:Q: 重载自己 Class 的 +load 方法时需不需要调父类？A: runtime 负责按继承顺序递归调用，所以我们不能调 super
+
+调用规则load方法调用，首先会调用父的load">
 
 
 
@@ -328,6 +334,9 @@ initialize调用时机这个">
 
       
         <h1 id="load和initialize的区别"><a href="#load和initialize的区别" class="headerlink" title="load和initialize的区别"></a>load和initialize的区别</h1><h2 id="load"><a href="#load" class="headerlink" title="load"></a>load</h2><h3 id="调用时机"><a href="#调用时机" class="headerlink" title="调用时机"></a>调用时机</h3><p>load方法在文件被程序加载的时候调用，只要文件在compile source中出现文件就会被记载，因此load方法会在<code>main</code>函数之前被调用。</p>
+<blockquote>
+<p>note:<br>Q: 重载自己 Class 的 +load 方法时需不需要调父类？<br>A: runtime 负责按继承顺序递归调用，所以我们不能调 super</p>
+</blockquote>
 <h3 id="调用规则"><a href="#调用规则" class="headerlink" title="调用规则"></a>调用规则</h3><p>load方法调用，首先会调用父的load方法，并且不需要手动去掉用，也就是说不需要super方法。即使自己实现了load方法，依旧会先去调用父类的load方法。</p>
 <h2 id="initialize"><a href="#initialize" class="headerlink" title="initialize"></a>initialize</h2><h3 id="调用时机-1"><a href="#调用时机-1" class="headerlink" title="调用时机"></a>调用时机</h3><p>这个方法会在自己第一次给某个类发送消息时调用（比如实例化某个对象），并且只会调用一次。initialize方法实际上是一种惰性调用，也就是如果这个类一直没有被调用到，那么就并不会走这个方法，这是为了节约资源。</p>
 <h3 id="调用规则-1"><a href="#调用规则-1" class="headerlink" title="调用规则"></a>调用规则</h3><p>initialize方法内部也会调用父类的方法，而且不需要我们显示的写出来。与load方法不同之处在于，及时子类没有实现，也依旧会调用父类的这个方法。</p>
@@ -336,6 +345,12 @@ initialize调用时机这个">
 <li><code>initialize</code>和<code>load</code>方法虽然都不用显示的调用父类的方法就会自动调用，但是<code>load</code>方法需要在子类中需要重载方法才会滴啊用父类的方法，<code>initialize</code>则并不需要在子类中重载就依旧会调用父类的方法。</li>
 <li><code>load</code>方法适合用来做method swizzing，<code>initialize</code>方法则适合初始化全部变量或者静态变量</li>
 <li><code>initialize</code>和<code>load</code>方法内部实现都使用了锁，因此他们是线程安全的。</li>
+</ol>
+<h2 id="程序加载的顺序"><a href="#程序加载的顺序" class="headerlink" title="程序加载的顺序"></a>程序加载的顺序</h2><ol>
+<li>dyld 开始将程序二进制文件初始化</li>
+<li>交由 ImageLoader 读取 image，其中包含了我们的类、方法等各种符号</li>
+<li>由于 runtime 向 dyld 绑定了回调，当 image 加载到内存后，dyld 会通知 runtime 进行处理</li>
+<li>runtime 接手后调用 map_images 做解析和处理，接下来 load_images 中调用 call_load_methods 方法，遍历所有加载进来的 Class，按继承层级依次调用 Class 的 +load 方法和其 Category 的 +load 方法<br><br>至此，可执行文件中和动态库所有的符号（Class，Protocol，Selector，IMP，…）都已经按格式成功加载到内存中，被 runtime 所管理，再这之后，runtime 的那些方法（动态添加 Class、swizzle 等等才能生效）</li>
 </ol>
 
       
@@ -507,7 +522,7 @@ initialize调用时机这个">
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#load和initialize的区别"><span class="nav-number">1.</span> <span class="nav-text">load和initialize的区别</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#load"><span class="nav-number">1.1.</span> <span class="nav-text">load</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#调用时机"><span class="nav-number">1.1.1.</span> <span class="nav-text">调用时机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#调用规则"><span class="nav-number">1.1.2.</span> <span class="nav-text">调用规则</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#initialize"><span class="nav-number">1.2.</span> <span class="nav-text">initialize</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#调用时机-1"><span class="nav-number">1.2.1.</span> <span class="nav-text">调用时机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#调用规则-1"><span class="nav-number">1.2.2.</span> <span class="nav-text">调用规则</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">1.3.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#load和initialize的区别"><span class="nav-number">1.</span> <span class="nav-text">load和initialize的区别</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#load"><span class="nav-number">1.1.</span> <span class="nav-text">load</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#调用时机"><span class="nav-number">1.1.1.</span> <span class="nav-text">调用时机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#调用规则"><span class="nav-number">1.1.2.</span> <span class="nav-text">调用规则</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#initialize"><span class="nav-number">1.2.</span> <span class="nav-text">initialize</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#调用时机-1"><span class="nav-number">1.2.1.</span> <span class="nav-text">调用时机</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#调用规则-1"><span class="nav-number">1.2.2.</span> <span class="nav-text">调用规则</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#总结"><span class="nav-number">1.3.</span> <span class="nav-text">总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#程序加载的顺序"><span class="nav-number">1.4.</span> <span class="nav-text">程序加载的顺序</span></a></li></ol></li></ol></div>
             
 
           </div>
