@@ -247,6 +247,148 @@
   
 
   <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/06/Runloop详解/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jacky Tian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jakcy’s Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+                <a class="post-title-link" href="/2017/04/06/Runloop详解/" itemprop="url">
+                  Runloop详解
+                </a>
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-04-06T14:22:17+08:00">
+                2017-04-06
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <blockquote>
+<p>Runloop实现了自动释放，延迟回调，触摸事件，屏幕刷新等功能。</p>
+</blockquote>
+<h2 id="Runloop概念"><a href="#Runloop概念" class="headerlink" title="Runloop概念"></a>Runloop概念</h2><ol>
+<li><p>NSRunLoop是iOS消息机制的处理模式:<br><br>NSRunLoop的主要作用：控制NSRunLoop里面线程的执行和休眠，在有事情做的时候使当前NSRunLoop控制的线程工作，没有事情做让当前NSRunLoop的控制的线程休眠。</p>
+</li>
+<li><p>NSRunLoop 就是一直在循环检测，从线程start到线程end，检测inputsource(如点击，双击等操作)同步事件，检测timesource同步事件，检测到输入源会执行处理函数，首先会产生通知，corefunction向线程添加runloop observers来监听事件，意在监听事件发生时来做处理。</p>
+</li>
+<li><p>runloopmode是一个集合，包括监听：事件源，定时器，以及需通知的runloop observers,模式包括：<br></p>
+<p> default模式：几乎包括所有输入源(除NSConnection) NSDefaultRunLoopMode模式</p>
+<p> Modal模式：处理modal panels事件,需要等待处理的input source为modal panel时设置，比如NSSavePanel和NSOpenPanel。</p>
+<p> connection模式：处理NSConnection事件，属于系统内部，用户基本不用</p>
+<p> event tracking模式：使用该模式来处理用户界面相关的事件,例如在拖动loop或其他user interface tracking loops时处于此种模式下，在此模式下会限制输入事件的处理。例如，当手指按住UITableView拖动时就会处于此模式</p>
+<p> common modes模式：这是一个伪模式，其为一组run loop mode的集合，将输入源加入此模式意味着在Common Modes中包含的所有模式下都可以处理。在Cocoa应用程序中，默认情况下Common Modes包含default modes,modal modes,event Tracking modes, 可使用CFRunLoopAddCommonMode方法向Common Modes中添加自定义modes。</p>
+</li>
+</ol>
+<p>注意这个并不是一个特定的mode，而是一个mode的集合，而runloop必须运行在一个特定的mode下。</p>
+<ol>
+<li>每次运行一个run loop，你指定（显式或隐式）run loop的运行模式。当相应的模式传递给run loop时，只有与该模式对应的 input sources才被监控并允许run loop对事件进行处理（与此类似，也只有与该模式对应的observers才会被通知）</li>
+<li>子线程中的NSRunLoop需要手动启动，在子线程中使用timer要启动NSRunLoop。</li>
+</ol>
+<p><a href="http://blog.wangruofeng007.com/blog/2016/01/12/runloopxiang-jie/" target="_blank" rel="external">这里有篇不错的文章</a></p>
+
+          
+        
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <div>
+      
+    </div>
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/04/05/iOS中图片的解压缩详解/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -2453,7 +2595,7 @@ rtmp {
           
             <div class="site-state-item site-state-posts">
               <a href="/archives">
-                <span class="site-state-item-count">19</span>
+                <span class="site-state-item-count">20</span>
                 <span class="site-state-item-name">日志</span>
               </a>
             </div>
@@ -2466,7 +2608,7 @@ rtmp {
             
             <div class="site-state-item site-state-tags">
               
-                <span class="site-state-item-count">13</span>
+                <span class="site-state-item-count">14</span>
                 <span class="site-state-item-name">标签</span>
               
             </div>

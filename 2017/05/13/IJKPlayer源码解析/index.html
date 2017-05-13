@@ -1,0 +1,835 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="直播、播放," />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="IJKPlayer是一个B站开源的播放器，基于FFmpeg，本文粗略的对IJKPlayer的源码进行详解
+
+FFmpeg的基本知识概念ffmpeg是一个非常有用的命令行程序，它可以用来转码媒体文件。它是领先的多媒体框架FFmpeg的一部分，其有很多功能，比如解码、编码、转码、混流、分离、转化为流、过滤以及播放几乎所有的由人和机器创建的媒体文件。在这个框架中包含有各种工具，每一个用于完成特定的功能">
+<meta property="og:type" content="article">
+<meta property="og:title" content="IJKPlayer源码解析">
+<meta property="og:url" content="http://yoursite.com/2017/05/13/IJKPlayer源码解析/index.html">
+<meta property="og:site_name" content="Jakcy’s Blog">
+<meta property="og:description" content="IJKPlayer是一个B站开源的播放器，基于FFmpeg，本文粗略的对IJKPlayer的源码进行详解
+
+FFmpeg的基本知识概念ffmpeg是一个非常有用的命令行程序，它可以用来转码媒体文件。它是领先的多媒体框架FFmpeg的一部分，其有很多功能，比如解码、编码、转码、混流、分离、转化为流、过滤以及播放几乎所有的由人和机器创建的媒体文件。在这个框架中包含有各种工具，每一个用于完成特定的功能">
+<meta property="og:image" content="https://github.com/jackytianhappy/ImgSource/blob/master/ffmpeg%E8%B0%83%E7%94%A8%E8%BF%87%E7%A8%8B.png?raw=true">
+<meta property="og:image" content="https://raw.githubusercontent.com/jackytianhappy/ImgSource/8335cff32c4659eca36442aa8ca292bdeeec682e/ffmpeg%E6%95%B4%E4%B8%AA%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B.png">
+<meta property="og:updated_time" content="2017-05-13T07:47:33.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="IJKPlayer源码解析">
+<meta name="twitter:description" content="IJKPlayer是一个B站开源的播放器，基于FFmpeg，本文粗略的对IJKPlayer的源码进行详解
+
+FFmpeg的基本知识概念ffmpeg是一个非常有用的命令行程序，它可以用来转码媒体文件。它是领先的多媒体框架FFmpeg的一部分，其有很多功能，比如解码、编码、转码、混流、分离、转化为流、过滤以及播放几乎所有的由人和机器创建的媒体文件。在这个框架中包含有各种工具，每一个用于完成特定的功能">
+<meta name="twitter:image" content="https://github.com/jackytianhappy/ImgSource/blob/master/ffmpeg%E8%B0%83%E7%94%A8%E8%BF%87%E7%A8%8B.png?raw=true">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    sidebar: {"position":"left","display":"post","offset":12,"offset_float":0,"b2t":false,"scrollpercent":false},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2017/05/13/IJKPlayer源码解析/"/>
+
+
+
+
+
+  <title> IJKPlayer源码解析 | Jakcy’s Blog </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">Jakcy’s Blog</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle">第一个博客</p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2017/05/13/IJKPlayer源码解析/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Jacky Tian">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Jakcy’s Blog">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                IJKPlayer源码解析
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2017-05-13T14:27:16+08:00">
+                2017-05-13
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <blockquote>
+<p>IJKPlayer是一个B站开源的播放器，基于FFmpeg，本文粗略的对IJKPlayer的源码进行详解</p>
+</blockquote>
+<h2 id="FFmpeg的基本知识"><a href="#FFmpeg的基本知识" class="headerlink" title="FFmpeg的基本知识"></a>FFmpeg的基本知识</h2><h3 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h3><p>ffmpeg是一个非常有用的命令行程序，它可以用来转码媒体文件。它是领先的多媒体框架FFmpeg的一部分，其有很多功能，比如解码、编码、转码、混流、分离、转化为流、过滤以及播放几乎所有的由人和机器创建的媒体文件。<br>在这个框架中包含有各种工具，每一个用于完成特定的功能。例如，ffserver能够将多媒体文件转化为用于实时广播的流，ffprobe用于分析多媒体流，ffplay可以当作一个简易的媒体播放器，ffmpeg则能够转换多媒体文件格式。</p>
+<p>FFMPEG从功能上划分为几个模块，分别为核心工具（libutils）、媒体格式（libavformat）、编解码（libavcodec）、设备（libavdevice）和后处理（libavfilter, libswscale, libpostproc），分别负责提供公用的功能函数、实现多媒体文件的读包和写包、完成音视频的编解码、管理音视频设备的操作以及进行音视频后处理。</p>
+<pre><code>libavutil是一个包含简化编程功能的库，其中包括随机数生成器，数据结构，数学代码，核心多媒体工具等更多东西。
+libavcodec是一个包含音频/视频解码器和编码器的库。
+libavformat是一个包含了多媒体格式的分离器和混流器的库。
+libavdevice是一个包含输入输出设备的库，用于捕捉和渲染很多来自常用的多媒体输入/输出软件框架的数据，包括Video4Linux，Video4Linux2，VfW和ALSA。
+libavfilter是一个包含媒体过滤器的库。AVFilter可以给视音频添加各种滤镜效果。可以给视频添加水印，给YUV数据加特效。
+libswscale是一个用于执行高度优化的图像缩放和颜色空间/像素格式转换操作的库。
+libswresample是一个用于执行高度优化的音频重采样，重新矩阵和取样格式转换操作的库。
+</code></pre><p>几种常见的基本概念：</p>
+<ol>
+<li>编解码器（CODEC）：能够进行视频和音频压缩（CO）与解压缩（DEC），是视频编解码的核心部分。<br></li>
+<li>容器/多媒体文件（Container/File）：没有了解视频的编解码之前，总是错误的认为平常下载的电影的文件的后缀（avi，mkv，rmvb等）就是视频的编码方式。事实上，刚才提到的几种文件的后缀并不是视频的编码方式，只是其封装的方式。一个视频文件通常有视频数据、音频数据以及字幕等，封装的格式决定这些数据在文件中是如何的存放的，封装在一起音频、视频等数据组成的多媒体文件，也可以叫做容器（其中包含了视音频数据）。所以，只看多媒体文件的后缀名是难以知道视音频的编码方式的。<br></li>
+<li>流数据 Stream: 例如视频流（Video Stream），音频流（Audio Stream）。流中的数据元素被称为帧Frame。一个多媒体文件包含有多个流（视频流 video stream，音频流 audio stream，字幕等）；流是一种抽象的概念，表示一连串的数据元素；<br>流中的数据元素称为帧Frame。</li>
+</ol>
+<h3 id="ffmpeg解码过程"><a href="#ffmpeg解码过程" class="headerlink" title="ffmpeg解码过程"></a>ffmpeg解码过程</h3><pre><code>1. 注册所有容器格式及其对应的CODEC: av_register_all()
+2. 打开文件: av_open_input_file()
+3. 从文件中提取流信息: av_find_stream_info()
+4. 穷举所有的流，查找其中种类为CODEC_TYPE_VIDEO的视频流video stream
+5. 查找对应的解码器: avcodec_find_decoder()
+6. 打开编解码器: avcodec_open2()
+7. 为解码帧分配内存: avcodec_alloc_frame()
+8. 不停地从码流中提取出帧数据到Packet中: av_read_frame()
+9. 判断帧的类型，对于视频帧调用: avcodec_decode_video2()
+10. 解码完后，释放解码器: avcodec_close()
+11. 关闭输入文件: avformat_close_input_file()
+</code></pre><h4 id="1-注册"><a href="#1-注册" class="headerlink" title="1.注册"></a>1.注册</h4><p>av_register_all该函数注册支持的所有的文件格式（容器）及其对应的CODEC，只需要调用一次，故一般放在main函数中。也可以注册某个特定的容器格式，但通常来说不需要这么做。</p>
+<h4 id="2-打开文件"><a href="#2-打开文件" class="headerlink" title="2.打开文件"></a>2.打开文件</h4><p>avformat_open_input该函数读取文件的头信息，并将其信息保存到AVFormatContext结构体中。其调用如下</p>
+<pre><code>AVFormatContext* pFormatCtx = nullptr;  
+avformat_open_input(&amp;pFormatCtx, filenName, nullptr, nullptr)
+</code></pre><p>第一个参数是AVFormatContext结构体的指针，第二个参数为文件路径；第三个参数用来设定输入文件的格式，如果设为null，将自动检测文件格式；第四个参数用来填充AVFormatContext一些字段以及Demuxer的private选项。<br>AVFormatContext包含有较多的码流信息参数，通常由avformat_open_input创建并填充关键字段。</p>
+<h4 id="3-获取必要的CODEC参数"><a href="#3-获取必要的CODEC参数" class="headerlink" title="3.获取必要的CODEC参数"></a>3.获取必要的CODEC参数</h4><p>avformat_open_input通过解析多媒体文件或流的头信息及其他的辅助数据，能够获取到足够多的关于文件、流和CODEC的信息，并将这些信息填充到AVFormatContext结构体中。但任何一种多媒体格式（容器）提供的信息都是有限的，而且不同的多媒体制作软件对头信息的设置也不尽相同，在制作多媒体文件的时候难免会引入一些错误。也就是说，仅仅通过avformat_open_input并不能保证能够获取所需要的信息，所以一般要使用</p>
+<pre><code>avformat_find_stream_info(AVFormatContext *ic, AVDictionary **options)
+avformat_find_stream_info主要用来获取必要的CODEC参数，设置到ic-&gt;streams[i]-&gt;codec。
+</code></pre><p>在解码的过程中，首先要获取到各个stream所对应的CODEC类型和id，CODEC的类型和id是两个枚举值，其定义如下:</p>
+<pre><code>enum AVMediaType { 
+   AVMEDIA_TYPE_UNKNOWN = -1,     
+   AVMEDIA_TYPE_VIDEO,     
+   AVMEDIA_TYPE_AUDIO,     
+   AVMEDIA_TYPE_DATA, 
+   AVMEDIA_TYPE_SUBTITLE,    
+   AVMEDIA_TYPE_ATTACHMENT,     
+   AVMEDIA_TYPE_NB
+ }; 
+
+enum CodecID { 
+  CODEC_ID_NONE,     /* video codecs */ 
+  CODEC_ID_MPEG1VIDEO, 
+  CODEC_ID_MPEG2VIDEO, ///&lt; preferred ID for MPEG-1/2 video decoding     
+  CODEC_ID_MPEG2VIDEO_XVMC,     
+  CODEC_ID_H261,     
+  CODEC_ID_H263, 
+  ...
+}
+</code></pre><p>通常，如果多媒体文件具有完整而正确的头信息，通过avformat_open_input即可用获得这两个参数。</p>
+<h4 id="4-打开解码器"><a href="#4-打开解码器" class="headerlink" title="4.打开解码器"></a>4.打开解码器</h4><p>经过上面的步骤，已经将文件格式信息读取到了AVFormatContext中，要打开流数据相应的CODEC需要经过下面几个步骤:</p>
+<ol>
+<li><p>找到视频流 video stream</p>
+<blockquote>
+<p>一个多媒体文件包含有多个原始流，例如 movie.mkv这个多媒体文件可能包含下面的流数据</p>
+</blockquote>
+<pre><code>原始流 1 h.264 video &lt;br&gt;
+原始流 2 aac audio for Chinese &lt;br&gt;
+原始流 3 aac audio for English &lt;br&gt;
+原始流 4 Chinese Subtitle &lt;br&gt;
+原始流 5 English Subtitle &lt;br&gt;
+</code></pre></li>
+</ol>
+<p>要解码视频，首先要在AVFormatContext包含的多个流中找到CODEC类型为AVMEDIA_TYPE_VIDEO，代码如下：</p>
+<pre><code>//查找视频流 video stream
+int videoStream = -1;
+for (int i = 0; i &lt; pFormatCtx-&gt;nb_streams; i++)
+{
+    if (pFormatCtx-&gt;streams[i]-&gt;codec-&gt;codec_type == AVMEDIA_TYPE_VIDEO)
+    {
+        videoStream = i;
+        break;
+    }
+}
+if (videoStream == -1)
+    return -1; // 没有找到视频流video stream
+</code></pre><p>结构体AVFormatContext中的streams字段是一个AVStream指针的数组，包含了文件所有流的描述，上述上述代码在该数组中查找CODEC类型为<br>AVMEDIA_TYPE_VIDEO的流的下标。</p>
+<p>根据codec_id找到相应的CODEC，并打开结构体AVCodecContext描述了CODEC上下文，包含了众多CODEC所需要的参数信息。</p>
+<pre><code>AVCodecContext* pCodecCtxOrg = nullptr; 
+AVCodec* pCodec = nullptr;
+pCodecCtxOrg = pFormatCtx-&gt;streams[videoStream]-&gt;codec; // codec context
+// 找到video stream的 decoder
+pCodec = avcodec_find_decoder(pCodecCtxOrg-&gt;codec_id); 
+// open codec
+if (avcodec_open2(pCodecCtxOrg , pCodec, nullptr) &lt; 0)
+   return -1; // Could open codec
+</code></pre><p>上述代码，首先通过codec_id找到相应的CODEC，然后调用avcodec_open2打开相应的CODEC。</p>
+<h4 id="5-读取数据帧并解码"><a href="#5-读取数据帧并解码" class="headerlink" title="5.读取数据帧并解码"></a>5.读取数据帧并解码</h4><p>已经有了相应的解码器，下面的工作就是将数据从流中读出，并解码为没有压缩的原始数据</p>
+<pre><code>AVPacket packet; 
+while (av_read_frame(pFormatCtx, &amp;packet) &gt;= 0)
+{
+     if (packet.stream_index == videoStream)
+     {
+         int frameFinished = 0;
+         avcodec_decode_video2(pCodecCtx, pFrame, &amp;frameFinished, &amp;packet);
+         if (frameFinished)
+         {
+             doSomething();
+         }
+     }
+
+}
+</code></pre><p>上述代码调用av_read_frame将数据从流中读取数据到packet中，并调用avcodec_decode_video2对读取的数据进行解码。</p>
+<h4 id="6-关闭"><a href="#6-关闭" class="headerlink" title="6.关闭"></a>6.关闭</h4><p>需要关闭avformat_open_input打开的输入流，avcodec_open2打开的CODEC</p>
+<pre><code>avcodec_close(pCodecCtxOrg);
+avformat_close_input(&amp;pFormatCtx);
+</code></pre><p>也就是说多媒体文件中，主要有两种数据：流Stream 及其数据元素帧Frame，在FFmpeg自然有与这两种数据相对应的抽象：AVStream和AVPacket。<br>使用FFmpeg的解码，数据的传递过程可归纳如下：</p>
+<pre><code>调用avformat_open_input打开流，将信息填充到AVFormatContext中
+调用av_read_frame从流中读取数据帧到 AVPacket，AVPacket保存仍然是未解码的数据。
+调用avcodec_decode_video2将AVPacket的数据解码，并将解码后的数据填充到AVFrame中，AVFrame中保存的是解码后的原始数据。
+</code></pre><p><img src="https://github.com/jackytianhappy/ImgSource/blob/master/ffmpeg%E8%B0%83%E7%94%A8%E8%BF%87%E7%A8%8B.png?raw=true" alt="Alta Text"></p>
+<h3 id="结构体的存储空间的分配与释放"><a href="#结构体的存储空间的分配与释放" class="headerlink" title="结构体的存储空间的分配与释放"></a>结构体的存储空间的分配与释放</h3><p>FFmpeg并没有垃圾回收机制，所分配的空间都需要自己维护。而由于视频处理过程中数据量是非常大，对于动态内存的使用更要谨慎。<br>本小节主要介绍解码过程使用到的结构体存储空间的分配与释放。</p>
+<p>AVFormatContext 在FFmpeg中有很重要的作用，描述一个多媒体文件的构成及其基本信息，存放了视频编解码过程中的大部分信息。通常该结构体由avformat_open_input分配存储空间，在最后调用avformat_input_close关闭。</p>
+<p>AVStream 描述一个媒体流，在解码的过程中，作为AVFormatContext的一个字段存在，不需要单独的处理。</p>
+<p>AVpacket 用来存放解码之前的数据，它只是一个容器，其data成员指向实际的数据缓冲区，在解码的过程中可有av_read_frame创建和填充AVPacket中的数据缓冲区，<br>当数据缓冲区不再使用的时候可以调用av_free_apcket释放这块缓冲区。</p>
+<p>AVFrame 存放从AVPacket中解码出来的原始数据，其必须通过av_frame_alloc来创建，通过av_frame_free来释放。和AVPacket类似，AVFrame中也有一块数据缓存空间，在调用av_frame_alloc的时候并不会为这块缓存区域分配空间，需要使用其他的方法。在解码的过程使用了两个AVFrame，这两个AVFrame分配缓存空间的方法也不相同</p>
+<pre><code>   一个AVFrame用来存放从AVPacket中解码出来的原始数据，这个AVFrame的数据缓存空间通过调avcodec_decode_video分配和填充。
+   另一个AVFrame用来存放将解码出来的原始数据变换为需要的数据格式（例如RGB，RGBA）的数据，这个AVFrame需要手动的分配数据缓存空间。代码如下：
+
+AVFrame *pFrameYUV;
+pFrameYUV = av_frame_alloc();
+// 手动为 pFrameYUV分配数据缓存空间
+int numBytes = avpicture_get_size(AV_PIX_FMT_YUV420P,pCodecCtx-&gt;widht,pCodecCtx-&gt;width);
+uint8_t *buffer = (uint8_t*)av_malloc(numBytes * sizeof(uint8_t));
+// 将分配的数据缓存空间和AVFrame关联起来
+avpicture_fill((AVPicture *)pFrameYUV, buffer, AV_PIX_FMT_YUV420P,pCodecCtx-&gt;width,  pCodecCtx-&gt;height)
+</code></pre><p>首先计算需要缓存空间大小，调用av_malloc分配缓存空间，最后调用avpicture_fill将分配的缓存空间和AVFrame关联起来。<br>调用av_frame_free来释放AVFrame，该函数不止释放AVFrame本身的空间，还会释放掉包含在其内的其他对象动态申请的空间，例如上面的缓存空间。</p>
+<pre><code>av_malloc和av_free，FFmpeg并没有提供垃圾回收机制，所有的内存管理都要手动进行。av_malloc只是在申请内存空间的时候会考虑到内存对齐（2字节，4字节对齐），
+其申请的空间要调用av_free释放。
+</code></pre><p>调用的函数</p>
+<pre><code>av_register_all 这个函数不用多说了，注册库所支持的容器格式及其对应的CODEC。
+avformat_open_input 打开多媒体文件流，并读取文件的头，将读取到的信息填充到AVFormatContext结构体中。在使用结束后，要调用avformat_close_input关闭打开的流
+avformat_find_stream_info 上面提到，avformat_open_input只是读取文件的头来得到多媒体文件的信息，但是有些文件没有文件头或者文件头的格式不正确，这就造成只调用
+avformat_open_input可能得不到解码所需要的必要信息，需要调用avformat_find_stream_info进一步得到流的信息。
+</code></pre><p>通过上面的三个函数已经获取了对多媒体文件进行解码的所需要信息，下面要做的就是根据这些信息得到相应的解码器。<br>结构体AVCodecContext描述了编解码器的上下文信息，包含了流中所使用的关于编解码器的所有信息，可以通过 AVFormatContext-&gt;AVStream-&gt;AVCodecContext来得到，在有了AVCodecContext后，可以通过codec_id来找到相应的解码器，具体代码如下</p>
+<pre><code>AVCodec* pCodec = nullptr;
+pCodecCtxOrg = pFormatCtx-&gt;streams[videoStream]-&gt;codec; // codec context
+// 找到video stream的 decoder
+pCodec = avcodec_find_decoder(pCodecCtxOrg-&gt;codec_id);  
+avcodec_find_decoder 可以通过codec_id或者名称来找到相应的解码器，返回值是一个AVCodec的指针。
+avcodec_open2 打开相应的编解码器
+av_read_frame 从流中读取数据帧暂存到AVPacket中
+avcodec_decode_video2 从AVPacket中解码数据到AVFrame中
+</code></pre><p>经过以上的过程，AVFrame中的数据缓存中存放的就是解码后的原始数据了。整个流程梳理如下：<br><img src="https://raw.githubusercontent.com/jackytianhappy/ImgSource/8335cff32c4659eca36442aa8ca292bdeeec682e/ffmpeg%E6%95%B4%E4%B8%AA%E8%A7%A3%E6%9E%90%E8%BF%87%E7%A8%8B.png" alt="Alta Text"></p>
+<blockquote>
+<p>note:<br><br>视音频技术主要包含以下几点：封装技术，视频压缩编码技术以及音频压缩编码技术。如果考虑到网络传输的话，还包括流媒体协议技术。<br><br>视频播放器播放一个互联网上的视频文件，需要经过以下几个步骤：解协议，解封装，解码视音频，视音频同步。<br><br>解协议的作用，就是将流媒体协议的数据，解析为标准的相应的封装格式数据。视音频在网络上传播的时候，常常采用各种流媒体协议，例如HTTP，RTMP，或是MMS等等。这些协议在传输视音频数据的同时，也会传输一些信令数据。这些信令数据包括对播放的控制（播放，暂停，停止），或者对网络状态的描述等。解协议的过程中会去除掉信令数据而只保留视音频数据。例如，采用RTMP协议传输的数据，经过解协议操作后，输出FLV格式的数据。<br><br>解封装的作用，就是将输入的封装格式的数据，分离成为音频流压缩编码数据和视频流压缩编码数据。封装格式种类很多，例如MP4，MKV，RMVB，TS，FLV，AVI等等，它的作用就是将已经压缩编码的视频数据和音频数据按照一定的格式放到一起。例如，FLV格式的数据，经过解封装操作后，输出H.264编码的视频码流和AAC编码的音频码流。<br><br>解码的作用，就是将视频/音频压缩编码数据，解码成为非压缩的视频/音频原始数据。音频的压缩编码标准包含AAC，MP3，AC-3等等，视频的压缩编码标准则包含H.264，MPEG2，VC-1等等。解码是整个系统中最重要也是最复杂的一个环节。通过解码，压缩编码的视频数据输出成为非压缩的颜色数据，例如YUV420P，RGB等等；压缩编码的音频数据输出成为非压缩的音频抽样数据，例如PCM数据。<br><br>视音频同步的作用，就是根据解封装模块处理过程中获取到的参数信息，同步解码出来的视频和音频数据，并将视频音频数据送至系统的显卡和声卡播放出来。<br></p>
+<p>概念:<br><br>视频的帧率（Frame Rate）指示视频一秒显示的帧数（图像数）<br><br>音频的采样率（Sample Rate）表示音频一秒播放的样本（Sample）的个数<br></p>
+</blockquote>
+<p>播放速度标准的选择：</p>
+<pre><code>将视频同步到音频上，就是以音频的播放速度为基准来同步视频。视频比音频播放慢了，加快其播放速度；快了，则延迟播放。
+将音频同步到视频上，就是以视频的播放速度为基准来同步音频。
+将视频和音频同步外部的时钟上，选择一个外部时钟为基准，视频和音频的播放速度都以该时钟为标准。
+</code></pre>
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/直播、播放/" rel="tag"># 直播、播放</a>
+          
+        </div>
+      
+
+      
+        
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2017/05/12/iOS常用知识点汇总/" rel="next" title="iOS常用知识点汇总">
+                <i class="fa fa-chevron-left"></i> iOS常用知识点汇总
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/images/avatar.gif"
+               alt="Jacky Tian" />
+          <p class="site-author-name" itemprop="name">Jacky Tian</p>
+           
+              <p class="site-description motion-element" itemprop="description"></p>
+          
+        </div>
+        <nav class="site-state motion-element">
+
+          
+            <div class="site-state-item site-state-posts">
+              <a href="/archives">
+                <span class="site-state-item-count">20</span>
+                <span class="site-state-item-name">日志</span>
+              </a>
+            </div>
+          
+
+          
+
+          
+            
+            
+            <div class="site-state-item site-state-tags">
+              
+                <span class="site-state-item-count">14</span>
+                <span class="site-state-item-name">标签</span>
+              
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#FFmpeg的基本知识"><span class="nav-number">1.</span> <span class="nav-text">FFmpeg的基本知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#概念"><span class="nav-number">1.1.</span> <span class="nav-text">概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ffmpeg解码过程"><span class="nav-number">1.2.</span> <span class="nav-text">ffmpeg解码过程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-注册"><span class="nav-number">1.2.1.</span> <span class="nav-text">1.注册</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-打开文件"><span class="nav-number">1.2.2.</span> <span class="nav-text">2.打开文件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-获取必要的CODEC参数"><span class="nav-number">1.2.3.</span> <span class="nav-text">3.获取必要的CODEC参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-打开解码器"><span class="nav-number">1.2.4.</span> <span class="nav-text">4.打开解码器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-读取数据帧并解码"><span class="nav-number">1.2.5.</span> <span class="nav-text">5.读取数据帧并解码</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-关闭"><span class="nav-number">1.2.6.</span> <span class="nav-text">6.关闭</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结构体的存储空间的分配与释放"><span class="nav-number">1.3.</span> <span class="nav-text">结构体的存储空间的分配与释放</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2017</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Jacky Tian</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Muse
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
