@@ -849,7 +849,15 @@ dealloc
 <p>  (3)可创建子文件夹：用来放置您希望被备份但不希望被用户看到的数据。该路径下的文件夹，除Caches以外，都会被iTunes备份。</p>
 </li>
 </ol>
-
+<h2 id="常用相等比较"><a href="#常用相等比较" class="headerlink" title="常用相等比较"></a>常用相等比较</h2><h3 id="“-”和isEqualToString"><a href="#“-”和isEqualToString" class="headerlink" title="“==”和isEqualToString"></a>“==”和isEqualToString</h3><pre><code>&quot;==&quot; ，比较两个指针的值
+isEqualToString，比较两个字符串是否相同
+</code></pre><h3 id="“-”和isEqual"><a href="#“-”和isEqual" class="headerlink" title="“==”和isEqual"></a>“==”和isEqual</h3><pre><code>&quot;==&quot; ，是判断两个对象的引用（reference）是否一样，也就是内存地址是否一样。
+isEqual ，判断是一个类方法，判断连个对象在类型和值上是否一样。
+</code></pre><h3 id="is-empty和isEqualToString"><a href="#is-empty和isEqualToString" class="headerlink" title="is empty和isEqualToString"></a>is empty和isEqualToString</h3><pre><code>[string isempty]判断字符串是不是null
+[string isEqualToString:@&quot;&quot;]判断是不是&quot;&quot;
+</code></pre><h3 id="isEqual和isEqualToString"><a href="#isEqual和isEqualToString" class="headerlink" title="isEqual和isEqualToString"></a>isEqual和isEqualToString</h3><pre><code>IsEqual 是 NSObject 的方法 ，而 isEqualToString 是 NSString 的方法
+因此从继承关系角度来说isEqualToString 是 isEqual 的衍生方法
+</code></pre>
           
         
       
