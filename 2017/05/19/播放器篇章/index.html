@@ -89,32 +89,26 @@
 
 <meta name="description" content="播放器基本是一个app，无论是信息流，还是视频类软件或直播类软件必不可少的软件。
 
-原生播放器此框架中提供MPMoviePlayerViewController这个类进行视频的播放，能够直接家在网络或者本地的视频
+原生播放器MediaPlayer/MediaPlayer.h此框架中提供MPMoviePlayerViewController这个类进行视频的播放，能够直接家在网络或者本地的视频
 
-这是一个使用MPMoviePlayerViewController的demo，项目下的PlayerInitWithApple工程
-
-MPMoviePlayerViewControll">
+这是一个使用MPMoviePlayerViewController的demo，项目下的PlayerInitWithApple工程">
 <meta property="og:type" content="article">
 <meta property="og:title" content="播放器篇章">
 <meta property="og:url" content="http://yoursite.com/2017/05/19/播放器篇章/index.html">
 <meta property="og:site_name" content="Jakcy’s Blog">
 <meta property="og:description" content="播放器基本是一个app，无论是信息流，还是视频类软件或直播类软件必不可少的软件。
 
-原生播放器此框架中提供MPMoviePlayerViewController这个类进行视频的播放，能够直接家在网络或者本地的视频
+原生播放器MediaPlayer/MediaPlayer.h此框架中提供MPMoviePlayerViewController这个类进行视频的播放，能够直接家在网络或者本地的视频
 
-这是一个使用MPMoviePlayerViewController的demo，项目下的PlayerInitWithApple工程
-
-MPMoviePlayerViewControll">
-<meta property="og:updated_time" content="2017-05-19T10:46:13.000Z">
+这是一个使用MPMoviePlayerViewController的demo，项目下的PlayerInitWithApple工程">
+<meta property="og:updated_time" content="2017-05-22T09:46:00.000Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="播放器篇章">
 <meta name="twitter:description" content="播放器基本是一个app，无论是信息流，还是视频类软件或直播类软件必不可少的软件。
 
-原生播放器此框架中提供MPMoviePlayerViewController这个类进行视频的播放，能够直接家在网络或者本地的视频
+原生播放器MediaPlayer/MediaPlayer.h此框架中提供MPMoviePlayerViewController这个类进行视频的播放，能够直接家在网络或者本地的视频
 
-这是一个使用MPMoviePlayerViewController的demo，项目下的PlayerInitWithApple工程
-
-MPMoviePlayerViewControll">
+这是一个使用MPMoviePlayerViewController的demo，项目下的PlayerInitWithApple工程">
 
 
 
@@ -342,12 +336,12 @@ MPMoviePlayerViewControll">
         <blockquote>
 <p>播放器基本是一个app，无论是信息流，还是视频类软件或直播类软件必不可少的软件。</p>
 </blockquote>
-<h2 id="原生播放器"><a href="#原生播放器" class="headerlink" title="原生播放器"></a>原生播放器</h2><h3 id=""><a href="#" class="headerlink" title=""></a><mediaplayer mediaplayer.h=""></mediaplayer></h3><p>此框架中提供<code>MPMoviePlayerViewController</code>这个类进行视频的播放，能够直接家在网络或者本地的视频</p>
+<h2 id="原生播放器"><a href="#原生播放器" class="headerlink" title="原生播放器"></a>原生播放器</h2><h3 id="MediaPlayer-MediaPlayer-h"><a href="#MediaPlayer-MediaPlayer-h" class="headerlink" title="MediaPlayer/MediaPlayer.h"></a>MediaPlayer/MediaPlayer.h</h3><p>此框架中提供<code>MPMoviePlayerViewController</code>这个类进行视频的播放，能够直接家在网络或者本地的视频</p>
 <blockquote>
 <p><a href="https://github.com/jackytianhappy/PlayerSet" target="_blank" rel="external">这是一个使用MPMoviePlayerViewController的demo，项目下的PlayerInitWithApple工程</a></p>
 </blockquote>
 <p><code>MPMoviePlayerViewController</code>是系统封装好的带视图的播放器，需不需要视图还是根据自己具体的业务进行选择。(一般情况下是不需要系统提供试视图，通过自定义视图进行实现)。</p>
-<font color="red">支持的格式</font>
+<font color="red">支持的格式： .mov, .mp4, .mpv, and .3gp</font>
 
 <h3 id="AVKit"><a href="#AVKit" class="headerlink" title="AVKit"></a>AVKit</h3><ol>
 <li>AVKit (AVPlayerViewController) 是iOS 8.0 开始使用的视频播放API</li>
@@ -366,7 +360,68 @@ MPMoviePlayerViewControll">
 </blockquote>
 </li>
 </ol>
-<font color="red">支持的格式</font>
+<font color="red">支持的视频编码方式：H.264、MPEG-4</font><br><br><font color="red">支持的格式:.mp4、 .mov、 .m4v、 .m2v、 .3gp、 .3g2</font>
+
+<h4 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h4><p>初始化方法：<br> self.playerVC = [[AVPlayerViewController alloc]init];</p>
+<pre><code>AVPlayerItem *item = [AVPlayerItem playerItemWithURL:[NSURL URLWithString:@&quot;http://vf1.mtime.cn/Video/2012/04/23/mp4/120423212602431929.mp4&quot;]];
+
+self.playerVC.player = [AVPlayer playerWithPlayerItem:item];
+
+self.playerVC.view.frame = self.view.bounds;
+
+self.playerVC.showsPlaybackControls = NO; //隐藏掉原生界面的控制按钮，接下来可以通过视图进行自定义
+
+self.playerVC.delegate = self; //设置播放器的delegate 进行播放
+
+[self.view addSubview:self.playerVC.view];
+
+[self.playerVC.player play];
+</code></pre><p>配合<code>UIProgressView</code>和<code>UISlider</code>方法能够进行进度的展示，以及进行调整进度。<br><br>如:显示播放进度：<br></p>
+<pre><code>- (void)addProgress{
+    AVPlayerItem *item = self.playerVC.player.currentItem;
+    UIProgressView *progress = self.progressView;
+
+    UISlider *slider = self.sliderBar;
+    slider.minimumValue = 0;
+    slider.maximumValue = 1;
+
+
+    [self.playerVC.player addPeriodicTimeObserverForInterval:CMTimeMake(1., 1.) queue:dispatch_get_main_queue() usingBlock:^(CMTime time) {
+
+        //CMTime是视频时间信息的结构体 包含视频时间点、美秒的帧数等信息
+        //获取当前的播放到的描述
+        float current = CMTimeGetSeconds(time);
+
+        //获取总的视频时间长度
+        float total = CMTimeGetSeconds(item.duration);
+
+        if (current) {
+            [progress setProgress:(current/total) animated:YES];
+            NSLog(@&quot;开始进行监听了:%f&quot;,(current/total));
+
+            slider.value = (current/total);
+        }
+
+    }];
+}
+</code></pre><p>如：控制播放进度：&lt;br</p>
+<pre><code>- (void)changeSliderValue:(id)sender{
+    NSLog(@&quot;开始进行拖拽&quot;);
+    UISlider *slider = (UISlider *)sender;
+
+
+    AVPlayerItem *item = self.playerVC.player.currentItem;
+
+//    //获取当前的播放到的描述
+//    float current = CMTimeGetSeconds(item.duration);
+//    
+//    //获取总的视频时间长度
+//    float total = CMTimeGetSeconds(item.duration);
+
+    //第一个参数为当前进度占总时间的时间
+    [self.playerVC.player seekToTime:CMTimeMake(CMTimeGetSeconds(item.duration)*slider.value, 1)];            
+}
+</code></pre>
       
     </div>
 
@@ -536,7 +591,7 @@ MPMoviePlayerViewControll">
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#原生播放器"><span class="nav-number">1.</span> <span class="nav-text">原生播放器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#"><span class="nav-number">1.1.</span> <span class="nav-text"></span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AVKit"><span class="nav-number">1.2.</span> <span class="nav-text">AVKit</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#原生播放器"><span class="nav-number">1.</span> <span class="nav-text">原生播放器</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#MediaPlayer-MediaPlayer-h"><span class="nav-number">1.1.</span> <span class="nav-text">MediaPlayer/MediaPlayer.h</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AVKit"><span class="nav-number">1.2.</span> <span class="nav-text">AVKit</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#使用方法"><span class="nav-number">1.2.1.</span> <span class="nav-text">使用方法</span></a></li></ol></li></ol></li></ol></div>
             
 
           </div>
