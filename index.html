@@ -412,7 +412,18 @@ self.playerVC.delegate = self; //设置播放器的delegate 进行播放
     //第一个参数为当前进度占总时间的时间
     [self.playerVC.player seekToTime:CMTimeMake(CMTimeGetSeconds(item.duration)*slider.value, 1)];            
 }
-</code></pre>
+</code></pre><p><a href="https://github.com/jackytianhappy/PlayerSet" target="_blank" rel="external">这里是我的demo地址</a></p>
+<h3 id="IJKPlayer"><a href="#IJKPlayer" class="headerlink" title="IJKPlayer"></a>IJKPlayer</h3><p><a href="https://github.com/Bilibili/ijkplayer" target="_blank" rel="external">这个是B站开源的播放器，直接对FFMpeg的一层包装,比较好用</a></p>
+<h4 id="将IJKPlayer添加到住程序中"><a href="#将IJKPlayer添加到住程序中" class="headerlink" title="将IJKPlayer添加到住程序中"></a>将IJKPlayer添加到住程序中</h4><ol>
+<li>首先从git仓库初始化项目，参考readme中的方法初始化IJKPlayer，最终项目路径在/Users/apple/Desktop/TestIJKPlayer/ijkplayer-ios/ios/IJKMediaDemo下，之余ffmpeg等的安装知识，可以<a href="https://jackytianhappy.github.io/2017/05/08/mac%E7%AB%AFffmpeg%E5%AE%89%E8%A3%85%E6%95%99%E7%A8%8B/" target="_blank" rel="external">这篇博客</a></li>
+<li>双击步骤一中目录下的iOS工程打开。</li>
+<li><a href="">将工程编译至framework，模拟器打包的只能通过模拟器使用，真机打包的话只能通过真机进行</a></li>
+</ol>
+<p><a href="https://github.com/jackytianhappy/PlayerSet" target="_blank" rel="external">这里是我的集成后的demo</a></p>
+<blockquote>
+<p>修改appDelegate中的根vc进入对应的播放器vc</p>
+</blockquote>
+
           
         
       
